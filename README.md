@@ -96,3 +96,10 @@ To return your fans to macOS automatic controller management:
 - Select **Auto** in the mode picker for individual fans.
 - Click the **"Reset All to Auto"** button at the top/bottom of the window.
 - Closing the application will also automatically release manual control overrides.
+
+---
+
+## 📄 License
+
+This project is open-source software licensed under the [MIT License](LICENSE).
+
