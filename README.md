@@ -4,7 +4,7 @@ A sleek, native SwiftUI macOS application designed for real-time monitoring and 
 
 <p align="center">
   <img src="screenshot.png" width="32%" alt="Main dashboard" />
-  <img src="screenshoot1.png" width="32%" alt="Dashboard with temperature history" />
+  <img src="screenshot1.png" width="32%" alt="Dashboard with temperature history" />
   <img src="screnshoot2.png" width="32%" alt="Rules engine and setup details" />
 </p>
 
@@ -13,8 +13,9 @@ It features a dual-component design: a sandboxed SwiftUI GUI front-end that comm
 ---
 
 ## Features
+
 - **Real-Time RPM Monitor**: Displays actual fan speeds with a custom rotating vector fan blade animation that responds to changes in RPM.
-- **Auto-Trigger Rules Engine**: Set custom, automated temperature rules for **CPU**, **GPU**, or **Battery** (e.g., *if CPU ≥ 75°C, override all fans to 80%*). Multiple active rules are evaluated dynamically, prioritizing the highest safety speed, and automatically returning control to macOS once the sensors cool down.
+- **Auto-Trigger Rules Engine**: Set custom, automated temperature rules for **CPU**, **GPU**, or **Battery** (e.g., _if CPU ≥ 75°C, override all fans to 80%_). Multiple active rules are evaluated dynamically, prioritizing the highest safety speed, and automatically returning control to macOS once the sensors cool down.
 - **Manual Mode Controls**: Precise target speed adjustment sliders.
 - **Quick Presets**: Set speed thresholds instantly using the **Min**, **20%**, **50%**, **80%**, or **Max** buttons.
 - **Linked Fan Tuning**: Option to sync adjustments across all system fans simultaneously.
@@ -26,21 +27,23 @@ It features a dual-component design: a sandboxed SwiftUI GUI front-end that comm
 ## 📂 Project Architecture & Code Structure
 
 The codebase is organized into clean, single-responsibility files conforming to MVVM patterns:
-*   📂 **`Core/`**: Core drivers (`SMC.swift`) managing the raw AppleSMC register reads/writes and Silicon unlocking sequences.
-*   📂 **`Models/`**: Shared structs (`FanJSON.swift`) describing deserialized telemetry packages and auto-rules.
-*   📂 **`ViewModels/`**: Orchestration logic (`FanViewModel.swift`) querying sensors, checking authorization, persisting rules, and evaluating automatic triggers.
-*   📂 **`Views/`**: Reusable SwiftUI layout pieces.
-    *   `SpinningFanView.swift`: Animated vector fan widget.
-    *   `TempMetricCard.swift`: Temperature telemetry indicators.
-    *   `FanControlRow.swift`: Single-fan state picking and speed slider row.
-    *   `RulesEngineView.swift`: Dynamic rules addition board.
-    *   `ContentView.swift`: Window layout coordinator.
-*   📂 **`App/`**: Application Entry Scene (`FanControlApp.swift`) coordinating regular activation and system Menu Bar Extra tray access.
-*   📂 **`Helper/`**: Privilege operations wrapper (`main.swift`) serving as a setuid execution client.
+
+- 📂 **`Core/`**: Core drivers (`SMC.swift`) managing the raw AppleSMC register reads/writes and Silicon unlocking sequences.
+- 📂 **`Models/`**: Shared structs (`FanJSON.swift`) describing deserialized telemetry packages and auto-rules.
+- 📂 **`ViewModels/`**: Orchestration logic (`FanViewModel.swift`) querying sensors, checking authorization, persisting rules, and evaluating automatic triggers.
+- 📂 **`Views/`**: Reusable SwiftUI layout pieces.
+  - `SpinningFanView.swift`: Animated vector fan widget.
+  - `TempMetricCard.swift`: Temperature telemetry indicators.
+  - `FanControlRow.swift`: Single-fan state picking and speed slider row.
+  - `RulesEngineView.swift`: Dynamic rules addition board.
+  - `ContentView.swift`: Window layout coordinator.
+- 📂 **`App/`**: Application Entry Scene (`FanControlApp.swift`) coordinating regular activation and system Menu Bar Extra tray access.
+- 📂 **`Helper/`**: Privilege operations wrapper (`main.swift`) serving as a setuid execution client.
 
 ---
 
 ## Prerequisites
+
 - **Operating System**: macOS 13.0 Ventura or newer.
 - **Build Tools**: Swift compiler (installed via Xcode or Xcode Command Line Tools).
 
@@ -66,6 +69,7 @@ This compiles `smc-helper` and `FanControl`, drafts the app metadata (`Info.plis
 
 1. **Launch the Application**:
    Open the application bundle in Finder or launch it from your terminal:
+
    ```bash
    open "Fan Control.app"
    ```
@@ -74,8 +78,9 @@ This compiles `smc-helper` and `FanControl`, drafts the app metadata (`Info.plis
    Writing custom values to the SMC requires administrative permission. On the first launch, follow these steps to configure access:
    - Click the orange **"Authorize & Enable Fan Adjustments"** button in the app window.
    - Enter your macOS administrator password when prompted.
-   
-   *Alternatively, you can manually set the privileged helper permissions using the command-line:*
+
+   _Alternatively, you can manually set the privileged helper permissions using the command-line:_
+
    ```bash
    sudo chown root:wheel "Fan Control.app/Contents/MacOS/smc-helper"
    sudo chmod +s "Fan Control.app/Contents/MacOS/smc-helper"
@@ -86,6 +91,7 @@ This compiles `smc-helper` and `FanControl`, drafts the app metadata (`Info.plis
 ## 🔒 Safety & System Restoration
 
 To return your fans to macOS automatic controller management:
-* Select **Auto** in the mode picker for individual fans.
-* Click the **"Reset All to Auto"** button at the top/bottom of the window.
-* Closing the application will also automatically release manual control overrides.
+
+- Select **Auto** in the mode picker for individual fans.
+- Click the **"Reset All to Auto"** button at the top/bottom of the window.
+- Closing the application will also automatically release manual control overrides.
