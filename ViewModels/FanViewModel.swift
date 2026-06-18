@@ -91,21 +91,25 @@ class FanViewModel: ObservableObject {
             return
         }
         
-        var error: NSDictionary? = nil
-        appleScript.executeAndReturnError(&error)
-        
-        if let err = error {
-            let desc = err[NSAppleScript.errorMessage] as? String ?? "Authorization rejected or failed."
-            if desc.contains("Read-only file system") {
-                self.errorMessage = "Please move Fan Control to your Applications folder before authorizing. The helper tool cannot be configured on a read-only disk image."
-            } else {
-                self.errorMessage = desc
+        DispatchQueue.global(qos: .userInitiated).async {
+            var error: NSDictionary? = nil
+            appleScript.executeAndReturnError(&error)
+            
+            DispatchQueue.main.async {
+                if let err = error {
+                    let desc = err[NSAppleScript.errorMessage] as? String ?? "Authorization rejected or failed."
+                    if desc.contains("Read-only file system") {
+                        self.errorMessage = "Please move Fan Control to your Applications folder before authorizing. The helper tool cannot be configured on a read-only disk image."
+                    } else {
+                        self.errorMessage = desc
+                    }
+                    self.isAuthorized = false
+                } else {
+                    self.errorMessage = nil
+                    self.isAuthorized = true
+                    self.updateStatus()
+                }
             }
-            self.isAuthorized = false
-        } else {
-            self.errorMessage = nil
-            self.isAuthorized = true
-            self.updateStatus()
         }
     }
     
@@ -121,32 +125,34 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: path)
-        task.arguments = ["get"]
-        
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = pipe
-        
-        do {
-            try task.run()
-            task.waitUntilExit()
+        DispatchQueue.global(qos: .default).async {
+            let task = Process()
+            task.executableURL = URL(fileURLWithPath: path)
+            task.arguments = ["get"]
             
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let decoded = try? JSONDecoder().decode(SystemStatusJSON.self, from: data) {
-                DispatchQueue.main.async {
-                    self.fans = decoded.fans
-                    self.cpuTemp = decoded.cpuTemp
-                    self.gpuTemp = decoded.gpuTemp
-                    self.batteryTemp = decoded.batteryTemp
-                    self.isPollingActive = true
-                    self.evaluateRules()
-                    self.recordHistoryIfNeeded()
+            let pipe = Pipe()
+            task.standardOutput = pipe
+            task.standardError = pipe
+            
+            do {
+                try task.run()
+                task.waitUntilExit()
+                
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                if let decoded = try? JSONDecoder().decode(SystemStatusJSON.self, from: data) {
+                    DispatchQueue.main.async {
+                        self.fans = decoded.fans
+                        self.cpuTemp = decoded.cpuTemp
+                        self.gpuTemp = decoded.gpuTemp
+                        self.batteryTemp = decoded.batteryTemp
+                        self.isPollingActive = true
+                        self.evaluateRules()
+                        self.recordHistoryIfNeeded()
+                    }
                 }
+            } catch {
+                print("Status fetch failed: \(error)")
             }
-        } catch {
-            print("Status fetch failed: \(error)")
         }
     }
     
@@ -154,21 +160,25 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: path)
-        
-        var args = ["set", "\(fanId)", "\(mode)"]
-        if mode == 1, let spd = speed {
-            args.append("\(spd)")
-        }
-        task.arguments = args
-        
-        do {
-            try task.run()
-            task.waitUntilExit()
-            updateStatus()
-        } catch {
-            print("Set fan failed: \(error)")
+        DispatchQueue.global(qos: .userInitiated).async {
+            let task = Process()
+            task.executableURL = URL(fileURLWithPath: path)
+            
+            var args = ["set", "\(fanId)", "\(mode)"]
+            if mode == 1, let spd = speed {
+                args.append("\(spd)")
+            }
+            task.arguments = args
+            
+            do {
+                try task.run()
+                task.waitUntilExit()
+                DispatchQueue.main.async {
+                    self.updateStatus()
+                }
+            } catch {
+                print("Set fan failed: \(error)")
+            }
         }
     }
     
@@ -202,16 +212,20 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: path)
-        task.arguments = ["reset"]
-        
-        do {
-            try task.run()
-            task.waitUntilExit()
-            updateStatus()
-        } catch {
-            print("Reset failed: \(error)")
+        DispatchQueue.global(qos: .userInitiated).async {
+            let task = Process()
+            task.executableURL = URL(fileURLWithPath: path)
+            task.arguments = ["reset"]
+            
+            do {
+                try task.run()
+                task.waitUntilExit()
+                DispatchQueue.main.async {
+                    self.updateStatus()
+                }
+            } catch {
+                print("Reset failed: \(error)")
+            }
         }
     }
     
