@@ -171,7 +171,6 @@ func main() {
         let speed = args.count > 4 ? Int(args[4]) : nil
         setFan(fanId: fanId, mode: mode, speed: speed)
     case "reset":
-        #if arch(arm64)
         let success = SMC.shared.resetFanControl()
         if success {
             print("SUCCESS: Reset fan controls")
@@ -179,9 +178,6 @@ func main() {
             print("ERROR: Failed to reset fan controls")
             exit(1)
         }
-        #else
-        print("SUCCESS: Reset not required on Intel Macs")
-        #endif
     default:
         print("ERROR: Unknown command '\(cmd)'")
         printHelp()

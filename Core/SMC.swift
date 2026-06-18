@@ -561,31 +561,48 @@ public class SMC {
         return writeWithRetry(modeVal, maxAttempts: maxAttempts, delayMicros: 100_000)
     }
 
+    #endif
+
     public func resetFanControl() -> Bool {
-        var value = SMCVal_t("Ftst")
-        let result = read(&value)
-        if result == kIOReturnSuccess && value.dataSize > 0 {
-            if value.bytes[0] == 0 { return true }
-            value.bytes[0] = 0
-            return writeWithRetry(value)
-        }
-
-        // Ftst absent (M5+): reset fan modes directly
-        guard let count = getValue("FNum") else { return false }
         var success = true
-        for i in 0..<Int(count) {
-            let modeKey = fanModeKey(i)
-            var modeVal = SMCVal_t(modeKey)
-            let readResult = read(&modeVal)
-            guard readResult == kIOReturnSuccess else { continue }
-            if modeVal.bytes[0] == 0 { continue }
-            modeVal.bytes[0] = 0
-
-            if !writeWithRetry(modeVal) { success = false }
+        var hasFtst = false
+        var ftstVal = SMCVal_t("Ftst")
+        
+        #if arch(arm64)
+        let ftstReadResult = read(&ftstVal)
+        hasFtst = (ftstReadResult == kIOReturnSuccess && ftstVal.dataSize > 0)
+        
+        if hasFtst {
+            if ftstVal.bytes[0] != 1 {
+                ftstVal.bytes[0] = 1
+                if !writeWithRetry(ftstVal, maxAttempts: 100) {
+                    print("Failed to unlock Ftst for reset")
+                } else {
+                    // Wait briefly for thermalmonitord to yield control
+                    usleep(1_000_000)
+                }
+            }
         }
+        #endif
+
+        guard let count = getValue("FNum") else { return false }
+        for i in 0..<Int(count) {
+            if !setFanMode(i, mode: .automatic) {
+                success = false
+            }
+        }
+
+        #if arch(arm64)
+        if hasFtst {
+            ftstVal.bytes[0] = 0
+            if !writeWithRetry(ftstVal, maxAttempts: 100) {
+                success = false
+            }
+        }
+        #endif
+
         return success
     }
-    #endif
 
     // MARK: - Low-Level connection methods
 

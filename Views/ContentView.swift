@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 // MARK: - Main Content View
 struct ContentView: View {
@@ -15,7 +16,7 @@ struct ContentView: View {
                             .font(.system(size: 20, weight: .black))
                             .foregroundColor(.white)
                         
-                        Text("v1.0")
+                        Text("v2.0")
                             .font(.system(size: 10, weight: .bold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -285,5 +286,35 @@ struct ContentView: View {
         }
         .frame(width: 580, height: 680)
         .background(Color(red: 0.08, green: 0.08, blue: 0.1))
+        .background(WindowAccessor { window in
+            window.delegate = MainWindowDelegate.shared
+        })
+    }
+}
+
+// MARK: - Window Accessor and Delegate for Menu Bar Mode
+struct WindowAccessor: NSViewRepresentable {
+    var onWindowBind: (NSWindow) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            if let window = view.window {
+                onWindowBind(window)
+            }
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+class MainWindowDelegate: NSObject, NSWindowDelegate {
+    static let shared = MainWindowDelegate()
+    
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        sender.orderOut(nil)
+        NSApplication.shared.setActivationPolicy(.accessory)
+        return false
     }
 }

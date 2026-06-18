@@ -108,7 +108,7 @@ cat <<EOF > "$CONTENTS_DIR/Info.plist"
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>2.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
@@ -150,4 +150,19 @@ echo "$APP_EXECUTABLE deployment targets:"
 vtool -show-build "$MACOS_DIR/$APP_EXECUTABLE" | grep "minos"
 echo "$HELPER_EXECUTABLE deployment targets:"
 vtool -show-build "$MACOS_DIR/$HELPER_EXECUTABLE" | grep "minos"
-echo "=== Build Complete: '$APP_DIR' created successfully ==="
+
+# 7. Codesign app bundle and binaries (ad-hoc signing)
+echo "Codesigning app and binaries..."
+codesign --force --sign - "$MACOS_DIR/smc-helper"
+codesign --force --sign - "$MACOS_DIR/FanControl"
+codesign --force --sign - "$APP_DIR"
+
+# 8. Create DMG disk image
+echo "Packaging to DMG..."
+rm -f "Fan Control.dmg"
+mkdir -p dist
+cp -R "$APP_DIR" dist/
+hdiutil create -volname "Fan Control v2.0" -srcfolder dist -ov -format UDZO "Fan Control.dmg"
+rm -rf dist
+
+echo "=== Build and Packaging Complete: 'Fan Control.dmg' created successfully ==="

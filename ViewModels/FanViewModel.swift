@@ -249,9 +249,27 @@ class FanViewModel: ObservableObject {
         for rule in rules where rule.isEnabled {
             guard let currentTemp = getTempFor(sensor: rule.sensor) else { continue }
             
-            if currentTemp >= rule.thresholdTemp {
-                if maxTargetPercent == nil || rule.targetSpeedPercent > maxTargetPercent! {
-                    maxTargetPercent = rule.targetSpeedPercent
+            if rule.ruleType == .threshold {
+                if currentTemp >= rule.thresholdTemp {
+                    if maxTargetPercent == nil || rule.targetSpeedPercent > maxTargetPercent! {
+                        maxTargetPercent = rule.targetSpeedPercent
+                    }
+                }
+            } else if rule.ruleType == .curve {
+                if currentTemp >= rule.minTemp {
+                    let range = rule.maxTemp - rule.minTemp
+                    let tempDiff = currentTemp - rule.minTemp
+                    let speedDiff = rule.maxSpeedPercent - rule.minSpeedPercent
+                    
+                    var calculatedPercent = rule.minSpeedPercent
+                    if range > 0 {
+                        let ratio = min(max(tempDiff / range, 0.0), 1.0)
+                        calculatedPercent = rule.minSpeedPercent + ratio * speedDiff
+                    }
+                    
+                    if maxTargetPercent == nil || calculatedPercent > maxTargetPercent! {
+                        maxTargetPercent = calculatedPercent
+                    }
                 }
             }
         }

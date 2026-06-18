@@ -82,6 +82,7 @@ struct FanControlApp: App {
     }
     
     private func openMainWindow() {
+        NSApplication.shared.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         if let window = NSApplication.shared.windows.first {
             window.makeKeyAndOrderFront(nil)

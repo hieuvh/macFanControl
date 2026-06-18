@@ -73,7 +73,8 @@ struct RuleRowView: View {
     var onDelete: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
+            // Header Row: Toggle, Sensor, Rule Type, Trash
             HStack(spacing: 12) {
                 Toggle("", isOn: $rule.isEnabled)
                     .toggleStyle(SwitchToggleStyle(tint: .green))
@@ -93,18 +94,14 @@ struct RuleRowView: View {
                 .background(Color.white.opacity(0.05))
                 .cornerRadius(6)
                 
-                Text("temp ≥")
-                    .font(.system(size: 13))
-                    .foregroundColor(.gray)
-                
-                Text("\(Int(rule.thresholdTemp))°C")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(width: 36)
-                
-                Slider(value: $rule.thresholdTemp, in: 30...95, step: 1)
-                    .accentColor(.purple)
-                    .frame(width: 80)
+                Picker("", selection: $rule.ruleType) {
+                    Text("Threshold").tag(TriggerRule.RuleType.threshold)
+                    Text("Curve (Min/Max)").tag(TriggerRule.RuleType.curve)
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 140)
+                .background(Color.white.opacity(0.05))
+                .cornerRadius(6)
                 
                 Spacer()
                 
@@ -118,21 +115,97 @@ struct RuleRowView: View {
                 .buttonStyle(PlainButtonStyle())
             }
             
-            HStack(spacing: 12) {
-                Spacer().frame(width: 48)
-                Text("Set speed to")
-                    .font(.system(size: 13))
-                    .foregroundColor(.gray)
-                
-                Text("\(Int(rule.targetSpeedPercent))%")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(width: 36)
-                
-                Slider(value: $rule.targetSpeedPercent, in: 0...100, step: 5)
-                    .accentColor(.purple)
-                
-                Spacer()
+            // Details Row
+            if rule.ruleType == .threshold {
+                VStack(spacing: 8) {
+                    HStack(spacing: 12) {
+                        Spacer().frame(width: 48)
+                        Text("If temp ≥")
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
+                        
+                        Text("\(Int(rule.thresholdTemp))°C")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 36)
+                        
+                        Slider(value: $rule.thresholdTemp, in: 30...95, step: 1)
+                            .accentColor(.purple)
+                    }
+                    
+                    HStack(spacing: 12) {
+                        Spacer().frame(width: 48)
+                        Text("Set speed to")
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
+                        
+                        Text("\(Int(rule.targetSpeedPercent))%")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 36)
+                        
+                        Slider(value: $rule.targetSpeedPercent, in: 0...100, step: 5)
+                            .accentColor(.purple)
+                    }
+                }
+            } else {
+                VStack(spacing: 8) {
+                    HStack(spacing: 12) {
+                        Spacer().frame(width: 48)
+                        Text("Temp range:")
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
+                            .frame(width: 80, alignment: .leading)
+                        
+                        Text("\(Int(rule.minTemp))°C")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.teal)
+                            .frame(width: 36)
+                        
+                        Slider(value: $rule.minTemp, in: 30...Double(max(30, Int(rule.maxTemp) - 5)), step: 1)
+                            .accentColor(.teal)
+                        
+                        Text("to")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                        
+                        Text("\(Int(rule.maxTemp))°C")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.red)
+                            .frame(width: 36)
+                        
+                        Slider(value: $rule.maxTemp, in: Double(min(95, Int(rule.minTemp) + 5))...95, step: 1)
+                            .accentColor(.red)
+                    }
+                    
+                    HStack(spacing: 12) {
+                        Spacer().frame(width: 48)
+                        Text("Speed range:")
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
+                            .frame(width: 80, alignment: .leading)
+                        
+                        Text("\(Int(rule.minSpeedPercent))%")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.teal)
+                            .frame(width: 36)
+                        
+                        Slider(value: $rule.minSpeedPercent, in: 0...Double(max(0, Int(rule.maxSpeedPercent) - 5)), step: 5)
+                            .accentColor(.teal)
+                        
+                        Text("to")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                        
+                        Text("\(Int(rule.maxSpeedPercent))%")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.red)
+                            .frame(width: 36)
+                        
+                        Slider(value: $rule.maxSpeedPercent, in: Double(min(100, Int(rule.minSpeedPercent) + 5))...100, step: 5)
+                            .accentColor(.red)
+                    }
+                }
             }
         }
         .padding(12)
