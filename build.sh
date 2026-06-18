@@ -6,6 +6,7 @@ set -euo pipefail
 APP_NAME="Fan Control"
 APP_EXECUTABLE="FanControl"
 HELPER_EXECUTABLE="smc-helper"
+SIGNING_IDENTITY="Developer ID Application: Shahzaib Ali (VJ3BBPZBDU)"
 
 APP_DIR="${APP_NAME}.app"
 CONTENTS_DIR="$APP_DIR/Contents"
@@ -151,11 +152,11 @@ vtool -show-build "$MACOS_DIR/$APP_EXECUTABLE" | grep "minos"
 echo "$HELPER_EXECUTABLE deployment targets:"
 vtool -show-build "$MACOS_DIR/$HELPER_EXECUTABLE" | grep "minos"
 
-# 7. Codesign app bundle and binaries (ad-hoc signing)
+# 7. Codesign app bundle and binaries
 echo "Codesigning app and binaries..."
-codesign --force --sign - "$MACOS_DIR/smc-helper"
-codesign --force --sign - "$MACOS_DIR/FanControl"
-codesign --force --sign - "$APP_DIR"
+codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$MACOS_DIR/$HELPER_EXECUTABLE"
+codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$MACOS_DIR/$APP_EXECUTABLE"
+codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$APP_DIR"
 
 # 8. Create DMG disk image
 echo "Packaging to DMG..."
@@ -164,5 +165,8 @@ mkdir -p dist
 cp -R "$APP_DIR" dist/
 hdiutil create -volname "Fan Control v2.0" -srcfolder dist -ov -format UDZO "Fan Control.dmg"
 rm -rf dist
+
+echo "Codesigning DMG..."
+codesign --force --sign "$SIGNING_IDENTITY" "Fan Control.dmg"
 
 echo "=== Build and Packaging Complete: 'Fan Control.dmg' created successfully ==="
