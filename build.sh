@@ -163,6 +163,8 @@ echo "Packaging to DMG..."
 rm -f "Fan Control.dmg"
 mkdir -p dist
 cp -R "$APP_DIR" dist/
+# Add a symbolic link to /Applications for easy drag-and-drop installation
+ln -s /Applications dist/Applications
 hdiutil create -volname "Fan Control v2.0" -srcfolder dist -ov -format UDZO "Fan Control.dmg"
 rm -rf dist
 
