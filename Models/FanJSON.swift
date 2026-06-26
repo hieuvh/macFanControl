@@ -4,11 +4,11 @@ import Foundation
 struct FanJSON: Codable, Identifiable {
     let id: Int
     let name: String
-    let currentSpeed: Int
+    var currentSpeed: Int
     let minSpeed: Int
     let maxSpeed: Int
-    let targetSpeed: Int
-    let mode: Int
+    var targetSpeed: Int
+    var mode: Int
 }
 
 struct SystemStatusJSON: Codable {

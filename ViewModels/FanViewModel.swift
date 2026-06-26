@@ -195,13 +195,17 @@ class FanViewModel: ObservableObject {
     
     func changeFanMode(fanId: Int, mode: Int) {
         if linkedFans {
-            for fan in fans {
-                let targetSpeed = mode == 1 ? fan.minSpeed : nil
-                setFanMode(fanId: fan.id, mode: mode, speed: targetSpeed)
+            for i in 0..<fans.count {
+                fans[i].mode = mode
+                if mode == 1 { fans[i].targetSpeed = fans[i].minSpeed }
+                let targetSpeed = mode == 1 ? fans[i].minSpeed : nil
+                setFanMode(fanId: fans[i].id, mode: mode, speed: targetSpeed)
             }
         } else {
-            if let fan = fans.first(where: { $0.id == fanId }) {
-                let targetSpeed = mode == 1 ? fan.minSpeed : nil
+            if let i = fans.firstIndex(where: { $0.id == fanId }) {
+                fans[i].mode = mode
+                if mode == 1 { fans[i].targetSpeed = fans[i].minSpeed }
+                let targetSpeed = mode == 1 ? fans[i].minSpeed : nil
                 setFanMode(fanId: fanId, mode: mode, speed: targetSpeed)
             }
         }
@@ -213,13 +217,20 @@ class FanViewModel: ObservableObject {
             let range = Double(sourceFan.maxSpeed - sourceFan.minSpeed)
             let pct = range > 0 ? (Double(speed) - Double(sourceFan.minSpeed)) / range : 0.0
             
-            for fan in fans {
-                let fanRange = Double(fan.maxSpeed - fan.minSpeed)
-                let targetSpeed = Double(fan.minSpeed) + fanRange * pct
-                let boundedSpeed = min(max(Int(targetSpeed), fan.minSpeed), fan.maxSpeed)
-                setFanMode(fanId: fan.id, mode: 1, speed: boundedSpeed)
+            for i in 0..<fans.count {
+                let fanRange = Double(fans[i].maxSpeed - fans[i].minSpeed)
+                let targetSpeed = Double(fans[i].minSpeed) + fanRange * pct
+                let boundedSpeed = min(max(Int(targetSpeed), fans[i].minSpeed), fans[i].maxSpeed)
+                
+                fans[i].mode = 1
+                fans[i].targetSpeed = boundedSpeed
+                setFanMode(fanId: fans[i].id, mode: 1, speed: boundedSpeed)
             }
         } else {
+            if let i = fans.firstIndex(where: { $0.id == fanId }) {
+                fans[i].mode = 1
+                fans[i].targetSpeed = speed
+            }
             setFanMode(fanId: fanId, mode: 1, speed: speed)
         }
     }
@@ -227,6 +238,10 @@ class FanViewModel: ObservableObject {
     func resetAll() {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
+        
+        for i in 0..<fans.count {
+            fans[i].mode = 0
+        }
         
         DispatchQueue.global(qos: .userInitiated).async {
             let task = Process()
@@ -249,19 +264,23 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
-        for fan in fans {
-            let range = Double(fan.maxSpeed - fan.minSpeed)
-            let targetSpeed = Double(fan.minSpeed) + range * pct
-            setFanMode(fanId: fan.id, mode: 1, speed: Int(targetSpeed))
+        for i in 0..<fans.count {
+            let range = Double(fans[i].maxSpeed - fans[i].minSpeed)
+            let targetSpeed = Double(fans[i].minSpeed) + range * pct
+            let speed = Int(targetSpeed)
+            
+            fans[i].mode = 1
+            fans[i].targetSpeed = speed
+            setFanMode(fanId: fans[i].id, mode: 1, speed: speed)
         }
     }
     
     func syncAllFans(toSpeed speed: Int) {
-        for fan in fans {
-            if fan.mode != 1 {
-                changeFanMode(fanId: fan.id, mode: 1)
+        for i in 0..<fans.count {
+            if fans[i].mode != 1 {
+                changeFanMode(fanId: fans[i].id, mode: 1)
             }
-            changeFanSpeed(fanId: fan.id, speed: speed)
+            changeFanSpeed(fanId: fans[i].id, speed: speed)
         }
     }
     
