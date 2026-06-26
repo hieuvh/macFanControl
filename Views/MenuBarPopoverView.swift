@@ -39,23 +39,18 @@ struct MenuBarPopoverView: View {
                 
                 // Sync All Fans
                 Button(action: { 
-                    for fan in viewModel.fans {
-                        let range = Double(fan.maxSpeed - fan.minSpeed)
-                        let val = Double(fan.minSpeed) + range * 0.5
-                        if fan.mode != 1 {
-                            viewModel.changeFanMode(fanId: fan.id, mode: 1)
-                        }
-                        viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
-                    }
+                    viewModel.linkedFans.toggle()
                 }) {
                     VStack {
                         Image(systemName: "link")
                             .font(.system(size: 14))
-                        Text("Sync 50%").font(.system(size: 8))
+                            .foregroundColor(viewModel.linkedFans ? .teal : .primary)
+                        Text(viewModel.linkedFans ? "Linked" : "Link Fans").font(.system(size: 8))
+                            .foregroundColor(viewModel.linkedFans ? .teal : .primary)
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
-                .help("Sync All Fans to 50%")
+                .help(viewModel.linkedFans ? "Unlink Fans" : "Sync All Fans Together")
                 
                 // Reset to Auto
                 Button(action: { viewModel.resetAll() }) {
