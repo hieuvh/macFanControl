@@ -6,7 +6,20 @@ set -euo pipefail
 APP_NAME="Fan Control"
 APP_EXECUTABLE="FanControl"
 HELPER_EXECUTABLE="smc-helper"
-SIGNING_IDENTITY="Developer ID Application: Shahzaib Ali (VJ3BBPZBDU)"
+SIGNING_IDENTITY="Developer ID Application: Hoang Viet Hieu (HCLH7T5H6G)"
+
+# Check if the identity exists, otherwise fallback to an available identity or ad-hoc
+if ! security find-identity -v -p codesigning | grep -q "$SIGNING_IDENTITY"; then
+    echo "Warning: Identity '$SIGNING_IDENTITY' not found."
+    AVAILABLE_IDENTITY=$(security find-identity -v -p codesigning | grep -E "Apple Development|Developer ID Application" | head -n 1 | awk -F'"' '{print $2}')
+    if [ -n "$AVAILABLE_IDENTITY" ]; then
+        echo "Using available identity: $AVAILABLE_IDENTITY"
+        SIGNING_IDENTITY="$AVAILABLE_IDENTITY"
+    else
+        echo "Falling back to ad-hoc signing."
+        SIGNING_IDENTITY="-"
+    fi
+fi
 
 APP_DIR="${APP_NAME}.app"
 CONTENTS_DIR="$APP_DIR/Contents"
@@ -161,6 +174,7 @@ codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$APP_DIR"
 # 8. Create DMG disk image
 echo "Packaging to DMG..."
 rm -f "Fan Control.dmg"
+rm -rf dist
 mkdir -p dist
 cp -R "$APP_DIR" dist/
 # Add a symbolic link to /Applications for easy drag-and-drop installation
