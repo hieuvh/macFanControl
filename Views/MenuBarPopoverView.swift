@@ -129,16 +129,21 @@ struct MenuBarFanRow: View {
     
     @State private var sliderVal: Double = 0.0
     @State private var isEditingSlider: Bool = false
+    @State private var animatableSpeed: Double = 0.0
     
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                SpinningFanView(currentSpeed: Double(fan.currentSpeed), maxSpeed: Double(fan.maxSpeed), size: 24)
+                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed), size: 24)
                 Text(fan.name).fontWeight(.bold)
                 Spacer()
-                Text("\(fan.currentSpeed) RPM")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 2) {
+                    Text("")
+                        .animatableNumber(value: animatableSpeed)
+                    Text("RPM")
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
             
             HStack(spacing: 6) {
@@ -155,10 +160,16 @@ struct MenuBarFanRow: View {
         .cornerRadius(8)
         .onAppear {
             sliderVal = Double(fan.targetSpeed)
+            animatableSpeed = Double(fan.currentSpeed)
         }
         .onChange(of: fan.targetSpeed) { newTarget in
             if !isEditingSlider {
                 sliderVal = Double(newTarget)
+            }
+        }
+        .onChange(of: fan.currentSpeed) { newSpeed in
+            withAnimation(.linear(duration: 1.5)) {
+                animatableSpeed = Double(newSpeed)
             }
         }
     }

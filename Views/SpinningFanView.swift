@@ -1,11 +1,16 @@
 import SwiftUI
 
 // MARK: - Animated Custom Vector Fan View
-struct SpinningFanView: View {
-    let currentSpeed: Double
+struct SpinningFanView: View, Animatable {
+    var currentSpeed: Double
     let maxSpeed: Double
     var size: CGFloat = 80 // Default size for main app
     @State private var angle: Double = 0.0
+    
+    var animatableData: Double {
+        get { currentSpeed }
+        set { currentSpeed = newValue }
+    }
     
     var body: some View {
         TimelineView(.animation) { timeline in

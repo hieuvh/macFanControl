@@ -9,19 +9,21 @@ struct FanControlRow: View {
     @State private var sliderVal: Double = 0.0
     @State private var isEditingSlider: Bool = false
     @State private var sliderPublisher = PassthroughSubject<Double, Never>()
+    @State private var animatableSpeed: Double = 0.0
     
     init(fan: FanJSON, viewModel: FanViewModel) {
         self.fan = fan
         self.viewModel = viewModel
         // Initial setup of state
         _sliderVal = State(initialValue: Double(fan.targetSpeed))
+        _animatableSpeed = State(initialValue: Double(fan.currentSpeed))
     }
     
     var body: some View {
         VStack(spacing: 16) {
             // Header Info
             HStack(spacing: 16) {
-                SpinningFanView(currentSpeed: Double(fan.currentSpeed), maxSpeed: Double(fan.maxSpeed))
+                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed))
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(fan.name)
@@ -29,7 +31,8 @@ struct FanControlRow: View {
                         .foregroundColor(.white)
                     
                     HStack(spacing: 8) {
-                        Text("\(fan.currentSpeed)")
+                        Text("")
+                            .animatableNumber(value: animatableSpeed)
                             .font(.system(size: 26, weight: .black, design: .monospaced))
                             .foregroundColor(rpmColor)
                         Text("RPM")
@@ -104,6 +107,12 @@ struct FanControlRow: View {
         .onChange(of: fan.targetSpeed) { newTarget in
             if !isEditingSlider {
                 sliderVal = Double(newTarget)
+            }
+        }
+        // Smoothly interpolate the visual RPM number towards the newest hardware snapshot
+        .onChange(of: fan.currentSpeed) { newSpeed in
+            withAnimation(.linear(duration: 1.5)) {
+                animatableSpeed = Double(newSpeed)
             }
         }
         // Publish slider changes while dragging
