@@ -13,9 +13,9 @@ struct SpinningFanView: View {
                 .aspectRatio(contentMode: .fit)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(Color.white.opacity(currentSpeed > 0 ? 0.8 : 0.3))
+                .frame(width: 80, height: 80)
                 .rotationEffect(.degrees(angle))
-            .frame(width: 80, height: 80)
-            .shadow(color: Color.teal.opacity(currentSpeed > 1000 ? 0.6 : 0), radius: currentSpeed > 3000 ? 6 : 2)
+                .shadow(color: Color.teal.opacity(currentSpeed > 1000 ? 0.6 : 0), radius: currentSpeed > 3000 ? 6 : 2)
             .onChange(of: timeline.date) { _ in
                 // Standardize rotation step to speed
                 // 1000 RPM -> ~4 deg per frame
