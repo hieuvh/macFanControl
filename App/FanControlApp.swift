@@ -17,9 +17,6 @@ struct FanControlApp: App {
         }
         .windowStyle(HiddenTitleBarWindowStyle())
         
-        Settings {
-            SettingsView()
-        }
         
         MenuBarExtra {
             MenuBarPopoverView(viewModel: viewModel)
