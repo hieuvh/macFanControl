@@ -17,7 +17,6 @@ class FanViewModel: ObservableObject {
     @Published var isPollingActive: Bool = false
     
     private var isFetchingStatus: Bool = false
-    private let smcQueue = DispatchQueue(label: "com.macfancontrol.smcQueue", qos: .userInitiated)
     
     @Published var rules: [TriggerRule] = [] {
         didSet {
@@ -126,46 +125,63 @@ class FanViewModel: ObservableObject {
     }
     
     func updateStatus() {
-        let path = helperPath
-        guard FileManager.default.fileExists(atPath: path) else { return }
-        
         guard !isFetchingStatus else { return }
         isFetchingStatus = true
         
-        smcQueue.async { [weak self] in
-            let task = Process()
-            task.executableURL = URL(fileURLWithPath: path)
-            task.arguments = ["get"]
+        DispatchQueue.global(qos: .default).async { [weak self] in
+            defer { self?.isFetchingStatus = false }
             
-            let pipe = Pipe()
-            task.standardOutput = pipe
-            task.standardError = pipe
+            let smc = SMC.shared
+            guard let fanCountVal = smc.getValue("FNum") else { return }
             
-            defer {
-                self?.isFetchingStatus = false
-                try? pipe.fileHandleForReading.close()
+            let fanCount = Int(fanCountVal)
+            var fansList: [FanJSON] = []
+            
+            for i in 0..<fanCount {
+                let name = smc.getStringValue("F\(i)ID") ?? "Fan \(i)"
+                let current = Int(smc.getValue("F\(i)Ac") ?? 0)
+                let minS = Int(smc.getValue("F\(i)Mn") ?? 0)
+                let maxS = Int(smc.getValue("F\(i)Mx") ?? 0)
+                let target = Int(smc.getValue("F\(i)Tg") ?? 0)
+                
+                let modeKey = smc.fanModeKey(i)
+                let mode = Int(smc.getValue(modeKey) ?? 0)
+                
+                fansList.append(FanJSON(
+                    id: i,
+                    name: name,
+                    currentSpeed: current,
+                    minSpeed: minS,
+                    maxSpeed: maxS,
+                    targetSpeed: target,
+                    mode: mode
+                ))
             }
             
-            do {
-                try task.run()
-                
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                task.waitUntilExit()
-                
-                if let decoded = try? JSONDecoder().decode(SystemStatusJSON.self, from: data) {
-                    DispatchQueue.main.async {
-                        guard let self = self else { return }
-                        self.fans = decoded.fans
-                        self.cpuTemp = decoded.cpuTemp
-                        self.gpuTemp = decoded.gpuTemp
-                        self.batteryTemp = decoded.batteryTemp
-                        self.isPollingActive = true
-                        self.evaluateRules()
-                        self.recordHistoryIfNeeded()
-                    }
+            let cpuKeys = ["TC0P", "TC0D", "TC0F", "TC1C", "TCAD", "TCBD", "Tp09", "Tp0T", "Tp01", "Tp05", "Tp0D", "Tp0C", "Tp0g", "Tp0h", "Te0S"]
+            let gpuKeys = ["TG0D", "TG0H", "TG0P", "Tg05", "Tg0j", "Tg0g", "Tg01", "Tg0c"]
+            let batteryKeys = ["TB0T", "TB1T", "TB2T", "Tw0P", "Ts0P", "Th0H"]
+            
+            func getFirstValidTemp(keys: [String]) -> Double? {
+                for key in keys {
+                    if let val = smc.getValue(key), val > 0 && val < 150 { return val }
                 }
-            } catch {
-                print("Status fetch failed: \(error)")
+                return nil
+            }
+            
+            let currentCpu = getFirstValidTemp(keys: cpuKeys)
+            let currentGpu = getFirstValidTemp(keys: gpuKeys)
+            let currentBatt = getFirstValidTemp(keys: batteryKeys)
+            
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.fans = fansList
+                self.cpuTemp = currentCpu
+                self.gpuTemp = currentGpu
+                self.batteryTemp = currentBatt
+                self.isPollingActive = true
+                self.evaluateRules()
+                self.recordHistoryIfNeeded()
             }
         }
     }
@@ -174,7 +190,7 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
-        smcQueue.async {
+        DispatchQueue.global(qos: .userInitiated).async {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             
@@ -253,7 +269,7 @@ class FanViewModel: ObservableObject {
             }
         }
         
-        smcQueue.async {
+        DispatchQueue.global(qos: .userInitiated).async {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             task.arguments = ["reset"]
