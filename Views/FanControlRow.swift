@@ -55,10 +55,12 @@ struct FanControlRow: View {
                         Text("Auto (\(Int(fan.currentSpeed)) RPM)")
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
+                            .contentTransition(.numericText())
                     } else {
                         Text("\(Int(sliderVal)) RPM (\(Int(speedPercentage))%)")
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
+                            .contentTransition(.numericText())
                     }
                 }
                 
@@ -142,14 +144,16 @@ struct FanControlRow: View {
         let isActive = isAuto ? (fan.mode == 0) : (fan.mode == 1 && abs(sliderVal - val) <= 2.0)
         
         return Button(action: {
-            if isAuto {
-                viewModel.changeFanMode(fanId: fan.id, mode: 0)
-            } else {
-                sliderVal = val
-                if fan.mode != 1 {
-                    viewModel.changeFanMode(fanId: fan.id, mode: 1)
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                if isAuto {
+                    viewModel.changeFanMode(fanId: fan.id, mode: 0)
+                } else {
+                    sliderVal = val
+                    if fan.mode != 1 {
+                        viewModel.changeFanMode(fanId: fan.id, mode: 1)
+                    }
+                    viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
                 }
-                viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
             }
         }) {
             Text(title)
