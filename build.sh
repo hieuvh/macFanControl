@@ -6,7 +6,7 @@ set -euo pipefail
 APP_NAME="Fan Control"
 APP_EXECUTABLE="FanControl"
 HELPER_EXECUTABLE="smc-helper"
-SIGNING_IDENTITY="Developer ID Application: Hoang Viet Hieu (HCLH7T5H6G)"
+SIGNING_IDENTITY="Apple Development: Hieu Vu (356JW5S467)"
 
 # Check if the identity exists, otherwise fallback to an available identity or ad-hoc
 if ! security find-identity -v -p codesigning | grep -q "$SIGNING_IDENTITY"; then
@@ -31,7 +31,7 @@ PRODUCTS_DIR="$BUILD_DIR/products"
 MODULE_CACHE_DIR="${MODULE_CACHE_DIR:-$BUILD_DIR/module-cache}"
 
 MACOS_DEPLOYMENT_TARGET="${MACOS_DEPLOYMENT_TARGET:-13.0}"
-ARCHS="${ARCHS:-arm64 x86_64}"
+ARCHS="${ARCHS:-arm64}"
 SDK_PATH="$(xcrun --sdk macosx --show-sdk-path)"
 
 HELPER_SOURCES=(

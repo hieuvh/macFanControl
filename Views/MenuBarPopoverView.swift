@@ -64,15 +64,15 @@ struct MenuBarPopoverView: View {
                 .help("Reset All to Auto")
                 
                 // Settings
-                Button(action: { NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) }) {
-                    VStack {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 14))
-                        Text("Settings").font(.system(size: 8))
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                .help("Open Settings")
+                // Button(action: { NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) }) {
+                //     VStack {
+                //         Image(systemName: "gearshape")
+                //             .font(.system(size: 14))
+                //         Text("Settings").font(.system(size: 8))
+                //     }
+                // }
+                // .buttonStyle(PlainButtonStyle())
+                // .help("Open Settings")
                 
                 // Quit
                 Button(action: { NSApplication.shared.terminate(nil) }) {
