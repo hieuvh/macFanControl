@@ -4,6 +4,7 @@ import SwiftUI
 struct SpinningFanView: View {
     let currentSpeed: Double
     let maxSpeed: Double
+    var size: CGFloat = 80 // Default size for main app
     @State private var angle: Double = 0.0
     
     var body: some View {
@@ -13,7 +14,7 @@ struct SpinningFanView: View {
                 .aspectRatio(contentMode: .fit)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(Color.white.opacity(currentSpeed > 0 ? 0.8 : 0.3))
-                .frame(width: 80, height: 80)
+                .frame(width: size, height: size)
                 .rotationEffect(.degrees(angle))
                 .shadow(color: Color.teal.opacity(currentSpeed > 1000 ? 0.6 : 0), radius: currentSpeed > 3000 ? 6 : 2)
             .onChange(of: timeline.date) { _ in

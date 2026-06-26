@@ -138,8 +138,7 @@ struct MenuBarFanRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                SpinningFanView(currentSpeed: Double(fan.currentSpeed), maxSpeed: Double(fan.maxSpeed))
-                    .frame(width: 24, height: 24)
+                SpinningFanView(currentSpeed: Double(fan.currentSpeed), maxSpeed: Double(fan.maxSpeed), size: 24)
                 Text(fan.name).fontWeight(.bold)
                 Spacer()
                 Text("\(fan.currentSpeed) RPM")
