@@ -209,9 +209,14 @@ class FanViewModel: ObservableObject {
     
     func changeFanSpeed(fanId: Int, speed: Int) {
         if linkedFans {
+            guard let sourceFan = fans.first(where: { $0.id == fanId }) else { return }
+            let range = Double(sourceFan.maxSpeed - sourceFan.minSpeed)
+            let pct = range > 0 ? (Double(speed) - Double(sourceFan.minSpeed)) / range : 0.0
+            
             for fan in fans {
-                // Ensure we don't exceed the bounds of each specific fan
-                let boundedSpeed = min(max(speed, fan.minSpeed), fan.maxSpeed)
+                let fanRange = Double(fan.maxSpeed - fan.minSpeed)
+                let targetSpeed = Double(fan.minSpeed) + fanRange * pct
+                let boundedSpeed = min(max(Int(targetSpeed), fan.minSpeed), fan.maxSpeed)
                 setFanMode(fanId: fan.id, mode: 1, speed: boundedSpeed)
             }
         } else {
