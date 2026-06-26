@@ -184,9 +184,6 @@ class FanViewModel: ObservableObject {
             do {
                 try task.run()
                 task.waitUntilExit()
-                DispatchQueue.main.async {
-                    self.updateStatus()
-                }
             } catch {
                 print("Set fan failed: \(error)")
             }
@@ -261,9 +258,6 @@ class FanViewModel: ObservableObject {
             do {
                 try task.run()
                 task.waitUntilExit()
-                DispatchQueue.main.async {
-                    self.updateStatus()
-                }
             } catch {
                 print("Reset failed: \(error)")
             }

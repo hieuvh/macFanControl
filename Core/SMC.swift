@@ -330,6 +330,11 @@ public class SMC {
     public func setFanMode(_ id: Int, mode: FanMode) -> Bool {
         #if arch(arm64)
         if mode == .forced {
+            let modeKey = fanModeKey(id)
+            var checkVal = SMCVal_t(modeKey)
+            if read(&checkVal) == kIOReturnSuccess && checkVal.bytes[0] == 1 {
+                return true
+            }
             return unlockFanControl(fanId: id)
         } else {
             let modeKey = fanModeKey(id)
@@ -356,6 +361,12 @@ public class SMC {
             }
 
             let bytes = Float(0).bytes
+            if targetValue.bytes[0] == bytes[0] && targetValue.bytes[1] == bytes[1] &&
+               targetValue.bytes[2] == bytes[2] && targetValue.bytes[3] == bytes[3] {
+                // Already 0
+                return true
+            }
+
             targetValue.bytes[0] = bytes[0]
             targetValue.bytes[1] = bytes[1]
             targetValue.bytes[2] = bytes[2]
@@ -375,17 +386,19 @@ public class SMC {
                 return false
             }
 
-            value.bytes = [UInt8(mode.rawValue), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
-                           UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
-                           UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
-                           UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
-                           UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
-                           UInt8(0), UInt8(0)]
+            if value.bytes[0] != UInt8(mode.rawValue) {
+                value.bytes = [UInt8(mode.rawValue), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
+                               UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
+                               UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
+                               UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
+                               UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0), UInt8(0),
+                               UInt8(0), UInt8(0)]
 
-            result = write(value)
-            if result != kIOReturnSuccess {
-                print("Error write: " + (String(cString: mach_error_string(result), encoding: String.Encoding.ascii) ?? "unknown error"))
-                return false
+                result = write(value)
+                if result != kIOReturnSuccess {
+                    print("Error write: " + (String(cString: mach_error_string(result), encoding: String.Encoding.ascii) ?? "unknown error"))
+                    return false
+                }
             }
         }
 
@@ -466,13 +479,22 @@ public class SMC {
 
         if value.dataType == "flt " {
             let bytes = Float(targetSpeed).bytes
+            if value.bytes[0] == bytes[0] && value.bytes[1] == bytes[1] &&
+               value.bytes[2] == bytes[2] && value.bytes[3] == bytes[3] {
+                return true
+            }
             value.bytes[0] = bytes[0]
             value.bytes[1] = bytes[1]
             value.bytes[2] = bytes[2]
             value.bytes[3] = bytes[3]
         } else if value.dataType == "fpe2" {
-            value.bytes[0] = UInt8(targetSpeed >> 6)
-            value.bytes[1] = UInt8((targetSpeed << 2) ^ ((targetSpeed >> 6) << 8))
+            let b0 = UInt8(targetSpeed >> 6)
+            let b1 = UInt8((targetSpeed << 2) ^ ((targetSpeed >> 6) << 8))
+            if value.bytes[0] == b0 && value.bytes[1] == b1 {
+                return true
+            }
+            value.bytes[0] = b0
+            value.bytes[1] = b1
             value.bytes[2] = UInt8(0)
             value.bytes[3] = UInt8(0)
         }
@@ -522,6 +544,9 @@ public class SMC {
             print(smcError("read", key: modeKey, result: modeRead))
             return false
         }
+        if modeVal.bytes[0] == 1 {
+            return true
+        }
         modeVal.bytes[0] = 1
         if write(modeVal) == kIOReturnSuccess {
             return true
@@ -556,6 +581,9 @@ public class SMC {
         guard result == kIOReturnSuccess else {
             print(smcError("read", key: modeKey, result: result))
             return false
+        }
+        if modeVal.bytes[0] == 1 {
+            return true
         }
         modeVal.bytes[0] = 1
         return writeWithRetry(modeVal, maxAttempts: maxAttempts, delayMicros: 100_000)
