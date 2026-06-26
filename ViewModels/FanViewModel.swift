@@ -16,6 +16,8 @@ class FanViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var isPollingActive: Bool = false
     
+    private var isFetchingStatus: Bool = false
+    
     @Published var rules: [TriggerRule] = [] {
         didSet {
             saveRules()
@@ -125,6 +127,9 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
+        guard !isFetchingStatus else { return }
+        isFetchingStatus = true
+        
         DispatchQueue.global(qos: .default).async {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
@@ -134,11 +139,17 @@ class FanViewModel: ObservableObject {
             task.standardOutput = pipe
             task.standardError = pipe
             
+            defer {
+                self.isFetchingStatus = false
+            }
+            
             do {
                 try task.run()
-                task.waitUntilExit()
                 
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                task.waitUntilExit()
+                pipe.fileHandleForReading.closeFile()
+                
                 if let decoded = try? JSONDecoder().decode(SystemStatusJSON.self, from: data) {
                     DispatchQueue.main.async {
                         self.fans = decoded.fans
@@ -237,6 +248,15 @@ class FanViewModel: ObservableObject {
             let range = Double(fan.maxSpeed - fan.minSpeed)
             let targetSpeed = Double(fan.minSpeed) + range * pct
             setFanMode(fanId: fan.id, mode: 1, speed: Int(targetSpeed))
+        }
+    }
+    
+    func syncAllFans(toSpeed speed: Int) {
+        for fan in fans {
+            if fan.mode != 1 {
+                changeFanMode(fanId: fan.id, mode: 1)
+            }
+            changeFanSpeed(fanId: fan.id, speed: speed)
         }
     }
     

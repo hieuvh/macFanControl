@@ -69,7 +69,7 @@ struct MenuBarPopoverView: View {
                 .help("Reset All to Auto")
                 
                 // Settings
-                Button(action: { NSApp.sendAction(Selector("showSettingsWindow:"), to: nil, from: nil) }) {
+                Button(action: { NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) }) {
                     VStack {
                         Image(systemName: "gearshape")
                             .font(.system(size: 14))
