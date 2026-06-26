@@ -17,6 +17,7 @@ struct TempMetricCard: View {
                 Image(systemName: iconName)
                     .foregroundColor(iconColor)
                     .font(.system(size: 14, weight: .semibold))
+                    .shadow(color: isSelected ? iconColor.opacity(0.8) : iconColor.opacity(0.4), radius: isSelected ? 4 : 0)
             }
             
             VStack(alignment: .leading, spacing: 2) {
@@ -29,13 +30,13 @@ struct TempMetricCard: View {
                 
                 if let t = temp {
                     Text(String(format: "%.1f°C", t))
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundColor(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 } else {
                     Text("--")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .foregroundColor(.gray)
                         .lineLimit(1)
                 }
@@ -52,11 +53,11 @@ struct TempMetricCard: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isSelected ? iconColor.opacity(0.08) : Color.white.opacity(0.04))
+        .background(isSelected ? iconColor.opacity(0.08) : Color.white.opacity(0.02))
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(isSelected ? iconColor.opacity(0.5) : Color.white.opacity(0.05), lineWidth: 1)
+                .stroke(isSelected ? iconColor.opacity(0.8) : Color.white.opacity(0.1), lineWidth: 1)
         )
     }
 }
