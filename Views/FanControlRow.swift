@@ -39,71 +39,55 @@ struct FanControlRow: View {
                 }
                 
                 Spacer()
-                
-                // Mode Select Picker
-                Picker("", selection: Binding(
-                    get: { fan.mode },
-                    set: { newMode in
-                        viewModel.changeFanMode(fanId: fan.id, mode: newMode)
-                    }
-                )) {
-                    Text("Auto").tag(0)
-                    Text("Manual").tag(1)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .frame(width: 150)
             }
             
-            // Speed Controls (if Manual Mode)
-            if fan.mode == 1 {
-                VStack(spacing: 12) {
-                    // Slider Label
-                    HStack {
-                        Text("Target Speed")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.gray)
-                        Spacer()
+            // Speed Controls
+            VStack(spacing: 12) {
+                // Slider Label
+                HStack {
+                    Text("Target Speed")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.gray)
+                    Spacer()
+                    if fan.mode == 0 {
+                        Text("Auto (\(Int(fan.currentSpeed)) RPM)")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.teal)
+                    } else {
                         Text("\(Int(sliderVal)) RPM (\(Int(speedPercentage))%)")
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
                     }
-                    
-                    // Slider
-                    Slider(
-                        value: $sliderVal,
-                        in: Double(fan.minSpeed)...Double(fan.maxSpeed),
-                        step: 50.0,
-                        onEditingChanged: { editing in
-                            isEditingSlider = editing
-                            if !editing {
-                                viewModel.changeFanSpeed(fanId: fan.id, speed: Int(sliderVal))
+                }
+                
+                // Slider
+                Slider(
+                    value: $sliderVal,
+                    in: Double(fan.minSpeed)...Double(fan.maxSpeed),
+                    step: 50.0,
+                    onEditingChanged: { editing in
+                        isEditingSlider = editing
+                        if editing {
+                            if fan.mode != 1 {
+                                viewModel.changeFanMode(fanId: fan.id, mode: 1)
                             }
+                        } else {
+                            viewModel.changeFanSpeed(fanId: fan.id, speed: Int(sliderVal))
                         }
-                    )
-                    .accentColor(.teal)
-                    
-                    // Presets
-                    HStack(spacing: 8) {
-                        presetButton(title: "Min", val: Double(fan.minSpeed))
-                        presetButton(title: "20%", val: getSpeedForPercentage(0.20))
-                        presetButton(title: "50%", val: getSpeedForPercentage(0.50))
-                        presetButton(title: "80%", val: getSpeedForPercentage(0.80))
-                        presetButton(title: "Max", val: Double(fan.maxSpeed))
                     }
+                )
+                .accentColor(.teal)
+                
+                // Presets
+                HStack(spacing: 8) {
+                    presetButton(title: "Auto", isAuto: true)
+                    presetButton(title: "20%", val: getSpeedForPercentage(0.20))
+                    presetButton(title: "50%", val: getSpeedForPercentage(0.50))
+                    presetButton(title: "80%", val: getSpeedForPercentage(0.80))
+                    presetButton(title: "Max", val: Double(fan.maxSpeed))
                 }
-                .padding(.top, 4)
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            } else {
-                HStack {
-                    Image(systemName: "cpu")
-                        .foregroundColor(.gray)
-                    Text("Mac system thermal controller is managing this fan.")
-                        .font(.system(size: 12))
-                        .foregroundColor(.gray)
-                    Spacer()
-                }
-                .padding(.vertical, 8)
             }
+            .padding(.top, 4)
         }
         .padding(20)
         .background(Color.white.opacity(0.02))
@@ -142,21 +126,30 @@ struct FanControlRow: View {
         return Double(fan.minSpeed) + range * pct
     }
     
-    func presetButton(title: String, val: Double) -> some View {
-        Button(action: {
-            sliderVal = val
-            viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
+    func presetButton(title: String, isAuto: Bool = false, val: Double = 0) -> some View {
+        let isActive = isAuto ? (fan.mode == 0) : (fan.mode == 1 && sliderVal == val)
+        
+        return Button(action: {
+            if isAuto {
+                viewModel.changeFanMode(fanId: fan.id, mode: 0)
+            } else {
+                sliderVal = val
+                if fan.mode != 1 {
+                    viewModel.changeFanMode(fanId: fan.id, mode: 1)
+                }
+                viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
+            }
         }) {
             Text(title)
                 .font(.system(size: 11, weight: .bold, design: .monospaced))
-                .foregroundColor(sliderVal == val ? .teal : .white)
+                .foregroundColor(isActive ? .teal : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
-                .background(sliderVal == val ? Color.teal.opacity(0.1) : Color.white.opacity(0.02))
+                .background(isActive ? Color.teal.opacity(0.1) : Color.white.opacity(0.02))
                 .cornerRadius(4)
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
-                        .stroke(sliderVal == val ? Color.teal.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1)
+                        .stroke(isActive ? Color.teal.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1)
                 )
         }
         .buttonStyle(PlainButtonStyle())

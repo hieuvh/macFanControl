@@ -25,22 +25,70 @@ struct MenuBarPopoverView: View {
             Divider()
             
             // Bottom Section: Actions
-            VStack(spacing: 8) {
-                Button("Open Fan Control Center") {
-                    openMainWindow()
+            HStack(spacing: 20) {
+                // Open App
+                Button(action: { openMainWindow() }) {
+                    VStack {
+                        Image(systemName: "macwindow")
+                            .font(.system(size: 14))
+                        Text("App").font(.system(size: 8))
+                    }
                 }
                 .buttonStyle(PlainButtonStyle())
+                .help("Open Fan Control Center")
                 
-                Button("Reset All to Auto") {
-                    viewModel.resetAll()
+                // Sync All Fans
+                Button(action: { 
+                    for fan in viewModel.fans {
+                        let range = Double(fan.maxSpeed - fan.minSpeed)
+                        let val = Double(fan.minSpeed) + range * 0.5
+                        if fan.mode != 1 {
+                            viewModel.changeFanMode(fanId: fan.id, mode: 1)
+                        }
+                        viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
+                    }
+                }) {
+                    VStack {
+                        Image(systemName: "link")
+                            .font(.system(size: 14))
+                        Text("Sync 50%").font(.system(size: 8))
+                    }
                 }
                 .buttonStyle(PlainButtonStyle())
+                .help("Sync All Fans to 50%")
                 
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
+                // Reset to Auto
+                Button(action: { viewModel.resetAll() }) {
+                    VStack {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 14))
+                        Text("Auto").font(.system(size: 8))
+                    }
                 }
                 .buttonStyle(PlainButtonStyle())
-                .foregroundColor(.red)
+                .help("Reset All to Auto")
+                
+                // Settings
+                Button(action: { NSApp.sendAction(Selector("showSettingsWindow:"), to: nil, from: nil) }) {
+                    VStack {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 14))
+                        Text("Settings").font(.system(size: 8))
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .help("Open Settings")
+                
+                // Quit
+                Button(action: { NSApplication.shared.terminate(nil) }) {
+                    VStack {
+                        Image(systemName: "power")
+                            .font(.system(size: 14))
+                            .foregroundColor(.red)
+                        Text("Quit").font(.system(size: 8)).foregroundColor(.red)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(.bottom, 15)
         }
@@ -90,36 +138,23 @@ struct MenuBarFanRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
+                SpinningFanView(currentSpeed: Double(fan.currentSpeed), maxSpeed: Double(fan.maxSpeed))
+                    .frame(width: 24, height: 24)
                 Text(fan.name).fontWeight(.bold)
                 Spacer()
-                Button(fan.mode == 1 ? "Manual" : "Auto") {
-                    let newMode = fan.mode == 1 ? 0 : 1
-                    viewModel.changeFanMode(fanId: fan.id, mode: newMode)
-                }
-                .buttonStyle(PlainButtonStyle())
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Color.white.opacity(0.1))
-                .cornerRadius(4)
+                Text("\(fan.currentSpeed) RPM")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
             
-            Slider(
-                value: $sliderVal,
-                in: Double(fan.minSpeed)...Double(fan.maxSpeed),
-                step: 100.0,
-                onEditingChanged: { editing in
-                    isEditingSlider = editing
-                    if !editing {
-                        viewModel.changeFanSpeed(fanId: fan.id, speed: Int(sliderVal))
-                    }
-                }
-            )
-            .disabled(fan.mode == 0) // Disabled if in Auto mode
-            
-            Text("\(fan.currentSpeed) RPM")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+            HStack(spacing: 6) {
+                presetButton(title: "Auto", isAuto: true)
+                presetButton(title: "20%", val: getSpeedForPercentage(0.20))
+                presetButton(title: "50%", val: getSpeedForPercentage(0.50))
+                presetButton(title: "80%", val: getSpeedForPercentage(0.80))
+                presetButton(title: "Max", val: Double(fan.maxSpeed))
+            }
+            .padding(.top, 4)
         }
         .padding()
         .background(Color.white.opacity(0.05))
@@ -132,5 +167,35 @@ struct MenuBarFanRow: View {
                 sliderVal = Double(newTarget)
             }
         }
+    }
+    
+    func getSpeedForPercentage(_ pct: Double) -> Double {
+        let range = Double(fan.maxSpeed - fan.minSpeed)
+        return Double(fan.minSpeed) + range * pct
+    }
+    
+    func presetButton(title: String, isAuto: Bool = false, val: Double = 0) -> some View {
+        let isActive = isAuto ? (fan.mode == 0) : (fan.mode == 1 && sliderVal == val)
+        
+        return Button(action: {
+            if isAuto {
+                viewModel.changeFanMode(fanId: fan.id, mode: 0)
+            } else {
+                sliderVal = val
+                if fan.mode != 1 {
+                    viewModel.changeFanMode(fanId: fan.id, mode: 1)
+                }
+                viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
+            }
+        }) {
+            Text(title)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(isActive ? .teal : .white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+                .background(isActive ? Color.teal.opacity(0.15) : Color.white.opacity(0.1))
+                .cornerRadius(4)
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
