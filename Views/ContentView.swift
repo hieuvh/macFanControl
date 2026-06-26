@@ -17,12 +17,13 @@ struct ContentView: View {
                             .foregroundColor(.white)
                         
                         Text("v2.0")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Color.blue.opacity(0.2))
-                            .foregroundColor(.blue)
-                            .cornerRadius(6)
+                            .background(Color.green.opacity(0.2))
+                            .foregroundColor(.green)
+                            .cornerRadius(4)
+                            .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.green.opacity(0.5), lineWidth: 1))
                     }
                     Text("Mac System SMC Monitoring & Adjustment")
                         .font(.system(size: 11))
@@ -285,7 +286,7 @@ struct ContentView: View {
             }
         }
         .frame(width: 580, height: 680)
-        .background(Color(red: 0.08, green: 0.08, blue: 0.1))
+        .background(Color(red: 0.04, green: 0.04, blue: 0.05))
         .background(WindowAccessor { window in
             window.delegate = MainWindowDelegate.shared
         })
