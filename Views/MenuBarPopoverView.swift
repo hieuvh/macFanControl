@@ -17,41 +17,7 @@ struct MenuBarPopoverView: View {
             // Middle Section: Fans
             VStack(spacing: 12) {
                 ForEach(viewModel.fans) { fan in
-                    VStack(alignment: .leading, spacing: 5) {
-                        HStack {
-                            Text(fan.name).fontWeight(.bold)
-                            Spacer()
-                            Button(fan.mode == 1 ? "Manual" : "Auto") {
-                                let newMode = fan.mode == 1 ? 0 : 1
-                                viewModel.changeFanMode(fanId: fan.id, mode: newMode)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.white.opacity(0.1))
-                            .cornerRadius(4)
-                        }
-                        
-                        Slider(
-                            value: Binding(
-                                get: { Double(fan.currentSpeed) },
-                                set: { newValue in
-                                    viewModel.changeFanSpeed(fanId: fan.id, speed: Int(newValue))
-                                }
-                            ),
-                            in: Double(fan.minSpeed)...Double(fan.maxSpeed),
-                            step: 100.0
-                        )
-                        .disabled(fan.mode == 0) // Disabled if in Auto mode
-                        
-                        Text("\(fan.currentSpeed) RPM")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    }
-                    .padding()
-                    .background(Color.white.opacity(0.05))
-                    .cornerRadius(8)
+                    MenuBarFanRow(fan: fan, viewModel: viewModel)
                 }
             }
             .padding(.horizontal)
@@ -111,5 +77,60 @@ struct TelemetryCard: View {
         .padding(10)
         .background(Color.white.opacity(0.05))
         .cornerRadius(8)
+    }
+}
+
+struct MenuBarFanRow: View {
+    var fan: FanJSON
+    @ObservedObject var viewModel: FanViewModel
+    
+    @State private var sliderVal: Double = 0.0
+    @State private var isEditingSlider: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack {
+                Text(fan.name).fontWeight(.bold)
+                Spacer()
+                Button(fan.mode == 1 ? "Manual" : "Auto") {
+                    let newMode = fan.mode == 1 ? 0 : 1
+                    viewModel.changeFanMode(fanId: fan.id, mode: newMode)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.white.opacity(0.1))
+                .cornerRadius(4)
+            }
+            
+            Slider(
+                value: $sliderVal,
+                in: Double(fan.minSpeed)...Double(fan.maxSpeed),
+                step: 100.0,
+                onEditingChanged: { editing in
+                    isEditingSlider = editing
+                    if !editing {
+                        viewModel.changeFanSpeed(fanId: fan.id, speed: Int(sliderVal))
+                    }
+                }
+            )
+            .disabled(fan.mode == 0) // Disabled if in Auto mode
+            
+            Text("\(fan.currentSpeed) RPM")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding()
+        .background(Color.white.opacity(0.05))
+        .cornerRadius(8)
+        .onAppear {
+            sliderVal = Double(fan.targetSpeed)
+        }
+        .onChange(of: fan.targetSpeed) { newTarget in
+            if !isEditingSlider {
+                sliderVal = Double(newTarget)
+            }
+        }
     }
 }
