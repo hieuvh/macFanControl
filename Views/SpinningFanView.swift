@@ -13,7 +13,7 @@ struct SpinningFanView: View, Animatable {
     }
     
     var body: some View {
-        TimelineView(.animation) { timeline in
+        TimelineView(.animation(paused: currentSpeed == 0)) { timeline in
             Image(systemName: "fan.fill")
                 .resizable()
                 .aspectRatio(contentMode: .fit)

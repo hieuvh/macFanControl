@@ -67,12 +67,12 @@ class FanViewModel: ObservableObject {
             let posixPermissions = attributes[.posixPermissions] as? Int ?? 0
             let isSetuid = (posixPermissions & 0o4000) != 0
             
-            DispatchQueue.main.async {
-                self.isAuthorized = (ownerId == 0 && isSetuid)
+            DispatchQueue.main.async { [weak self] in
+                self?.isAuthorized = (ownerId == 0 && isSetuid)
             }
         } else {
-            DispatchQueue.main.async {
-                self.isAuthorized = false
+            DispatchQueue.main.async { [weak self] in
+                self?.isAuthorized = false
             }
         }
     }
@@ -93,11 +93,12 @@ class FanViewModel: ObservableObject {
             return
         }
         
-        DispatchQueue.global(qos: .userInitiated).async {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             var error: NSDictionary? = nil
             appleScript.executeAndReturnError(&error)
             
             DispatchQueue.main.async {
+                guard let self = self else { return }
                 if let err = error {
                     let desc = err[NSAppleScript.errorMessage] as? String ?? "Authorization rejected or failed."
                     if desc.contains("Read-only file system") {
@@ -130,7 +131,7 @@ class FanViewModel: ObservableObject {
         guard !isFetchingStatus else { return }
         isFetchingStatus = true
         
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global(qos: .default).async { [weak self] in
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             task.arguments = ["get"]
@@ -140,7 +141,8 @@ class FanViewModel: ObservableObject {
             task.standardError = pipe
             
             defer {
-                self.isFetchingStatus = false
+                self?.isFetchingStatus = false
+                try? pipe.fileHandleForReading.close()
             }
             
             do {
@@ -148,10 +150,10 @@ class FanViewModel: ObservableObject {
                 
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 task.waitUntilExit()
-                pipe.fileHandleForReading.closeFile()
                 
                 if let decoded = try? JSONDecoder().decode(SystemStatusJSON.self, from: data) {
                     DispatchQueue.main.async {
+                        guard let self = self else { return }
                         self.fans = decoded.fans
                         self.cpuTemp = decoded.cpuTemp
                         self.gpuTemp = decoded.gpuTemp
@@ -403,5 +405,10 @@ class FanViewModel: ObservableObject {
             self.tempHistory = decoded
             self.lastHistoryRecordTime = decoded.last?.timestamp
         }
+    }
+    
+    deinit {
+        timer?.invalidate()
+        timer = nil
     }
 }
