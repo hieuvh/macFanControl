@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 // MARK: - Individual Fan Control Row
 struct FanControlRow: View {
@@ -7,6 +8,7 @@ struct FanControlRow: View {
     
     @State private var sliderVal: Double = 0.0
     @State private var isEditingSlider: Bool = false
+    @State private var sliderPublisher = PassthroughSubject<Double, Never>()
     
     init(fan: FanJSON, viewModel: FanViewModel) {
         self.fan = fan
@@ -101,6 +103,16 @@ struct FanControlRow: View {
             if !isEditingSlider {
                 sliderVal = Double(newTarget)
             }
+        }
+        // Publish slider changes while dragging
+        .onChange(of: sliderVal) { newValue in
+            if isEditingSlider {
+                sliderPublisher.send(newValue)
+            }
+        }
+        // Debounce continuous drag events to prevent spamming the SMC helper
+        .onReceive(sliderPublisher.debounce(for: .seconds(0.15), scheduler: RunLoop.main)) { debouncedVal in
+            viewModel.changeFanSpeed(fanId: fan.id, speed: Int(debouncedVal))
         }
     }
     
