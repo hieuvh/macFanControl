@@ -15,17 +15,17 @@ NSColor(red: 0.04, green: 0.04, blue: 0.05, alpha: 1.0).setFill()
 bgPath.fill()
 
 // 2. Prepare the SF Symbol
-let config = NSImage.SymbolConfiguration(pointSize: 600, weight: .bold)
-// Using hierarchical teal to give it that "High-Tech Dark" glowing vibe
-let colorConfig = NSImage.SymbolConfiguration(hierarchicalColor: NSColor.systemTeal)
+let config = NSImage.SymbolConfiguration(pointSize: 600, weight: .semibold)
+// Modern palette: Vibrant Cyan and Indigo
+let colorConfig = NSImage.SymbolConfiguration(paletteColors: [NSColor.systemCyan, NSColor.systemIndigo])
 let finalConfig = config.applying(colorConfig)
 
-if let symbol = NSImage(systemSymbolName: "fanblades.fill", accessibilityDescription: nil)?.withSymbolConfiguration(finalConfig) {
+if let symbol = NSImage(systemSymbolName: "fan.fill", accessibilityDescription: nil)?.withSymbolConfiguration(finalConfig) {
     
     // Setup shadow for glow effect
     let shadow = NSShadow()
-    shadow.shadowColor = NSColor.systemTeal.withAlphaComponent(0.8)
-    shadow.shadowBlurRadius = 40
+    shadow.shadowColor = NSColor.systemCyan.withAlphaComponent(0.6)
+    shadow.shadowBlurRadius = 45
     shadow.shadowOffset = .zero
     shadow.set()
     
@@ -38,7 +38,7 @@ if let symbol = NSImage(systemSymbolName: "fanblades.fill", accessibilityDescrip
     // Draw symbol
     symbol.draw(in: drawRect)
 } else {
-    print("Error: Could not load SF Symbol 'fanblades.fill'")
+    print("Error: Could not load SF Symbol 'fan.fill'")
 }
 
 image.unlockFocus()
