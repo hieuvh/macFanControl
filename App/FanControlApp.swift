@@ -17,16 +17,20 @@ struct FanControlApp: App {
         }
         .windowStyle(HiddenTitleBarWindowStyle())
         
+        Settings {
+            SettingsView()
+        }
+        
         MenuBarExtra {
             MenuBarPopoverView(viewModel: viewModel)
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "wind")
-                if let firstFan = viewModel.fans.first {
-                    Text("\(firstFan.currentSpeed) RPM")
-                } else {
-                    Text("Fan Control")
-                }
+                // if let firstFan = viewModel.fans.first {
+                //     Text("\(firstFan.currentSpeed) RPM")
+                // } else {
+                //     Text("Fan Control")
+                // }
             }
         }
         .menuBarExtraStyle(.window)

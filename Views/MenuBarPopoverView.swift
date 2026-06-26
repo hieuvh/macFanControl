@@ -9,7 +9,7 @@ struct MenuBarPopoverView: View {
             HStack(spacing: 10) {
                 TelemetryCard(temp: viewModel.cpuTemp, label: "CPU")
                 TelemetryCard(temp: viewModel.gpuTemp, label: "GPU")
-                TelemetryCard(temp: viewModel.batteryTemp, label: "BATT")
+                TelemetryCard(temp: viewModel.batteryTemp, label: "BATTERY")
             }
             .padding(.horizontal)
             .padding(.top, 15)

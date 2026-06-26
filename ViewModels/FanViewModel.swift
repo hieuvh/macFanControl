@@ -17,6 +17,7 @@ class FanViewModel: ObservableObject {
     @Published var isPollingActive: Bool = false
     
     private var isFetchingStatus: Bool = false
+    private let smcQueue = DispatchQueue(label: "com.macfancontrol.smcQueue", qos: .userInitiated)
     
     @Published var rules: [TriggerRule] = [] {
         didSet {
@@ -131,7 +132,7 @@ class FanViewModel: ObservableObject {
         guard !isFetchingStatus else { return }
         isFetchingStatus = true
         
-        DispatchQueue.global(qos: .default).async { [weak self] in
+        smcQueue.async { [weak self] in
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             task.arguments = ["get"]
@@ -173,7 +174,7 @@ class FanViewModel: ObservableObject {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
-        DispatchQueue.global(qos: .userInitiated).async {
+        smcQueue.async {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             
@@ -252,7 +253,7 @@ class FanViewModel: ObservableObject {
             }
         }
         
-        DispatchQueue.global(qos: .userInitiated).async {
+        smcQueue.async {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             task.arguments = ["reset"]
