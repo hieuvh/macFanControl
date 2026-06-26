@@ -65,6 +65,7 @@ struct SpinningFanView: View {
                 }
             }
             .frame(width: 80, height: 80)
+            .shadow(color: Color.teal.opacity(currentSpeed > 1000 ? 0.6 : 0), radius: currentSpeed > 3000 ? 6 : 2)
             .onChange(of: timeline.date) { _ in
                 // Standardize rotation step to speed
                 // 1000 RPM -> ~4 deg per frame

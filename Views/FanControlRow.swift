@@ -32,6 +32,7 @@ struct FanControlRow: View {
                             .foregroundColor(rpmColor)
                         Text("RPM")
                             .font(.system(size: 12, weight: .bold))
+                            .tracking(1)
                             .foregroundColor(.gray)
                             .offset(y: 4)
                     }
@@ -105,11 +106,11 @@ struct FanControlRow: View {
             }
         }
         .padding(20)
-        .background(Color.white.opacity(0.03))
-        .cornerRadius(16)
+        .background(Color.white.opacity(0.02))
+        .cornerRadius(12)
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.06), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
         // Keep slider synchronized with system status updates if user is not actively dragging it
         .onChange(of: fan.targetSpeed) { newTarget in
@@ -147,12 +148,16 @@ struct FanControlRow: View {
             viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
         }) {
             Text(title)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(.white)
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .foregroundColor(sliderVal == val ? .teal : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
-                .background(Color.white.opacity(0.06))
-                .cornerRadius(8)
+                .background(sliderVal == val ? Color.teal.opacity(0.1) : Color.white.opacity(0.02))
+                .cornerRadius(4)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(sliderVal == val ? Color.teal.opacity(0.5) : Color.white.opacity(0.1), lineWidth: 1)
+                )
         }
         .buttonStyle(PlainButtonStyle())
     }
