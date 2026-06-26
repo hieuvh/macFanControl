@@ -174,7 +174,7 @@ struct MenuBarFanRow: View {
     }
     
     func presetButton(title: String, isAuto: Bool = false, val: Double = 0) -> some View {
-        let isActive = isAuto ? (fan.mode == 0) : (fan.mode == 1 && sliderVal == val)
+        let isActive = isAuto ? (fan.mode == 0) : (fan.mode == 1 && Int(sliderVal) == Int(val))
         
         return Button(action: {
             if isAuto {
