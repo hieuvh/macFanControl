@@ -3,12 +3,28 @@ import AppKit
 import ServiceManagement
 
 // MARK: - View Model
+@MainActor
 class FanViewModel: ObservableObject {
-    @Published var fans: [FanJSON] = []
-    @Published var cpuTemp: Double? = nil
-    @Published var gpuTemp: Double? = nil
-    @Published var batteryTemp: Double? = nil
+    @Published var snapshot: FanSnapshot = FanSnapshot(fans: [], cpuTemp: nil, gpuTemp: nil, batteryTemp: nil, timestamp: Date())
     @Published var tempHistory: [TempRecord] = []
+    
+    public var fans: [FanJSON] {
+        get { snapshot.fans }
+        set { snapshot.fans = newValue }
+    }
+    public var cpuTemp: Double? { snapshot.cpuTemp }
+    public var gpuTemp: Double? { snapshot.gpuTemp }
+    public var batteryTemp: Double? { snapshot.batteryTemp }
+    
+    private(set) var ringBuffer: [TempRecord] = []
+    
+    func expand() {
+        loadHistory()
+    }
+    
+    func shrink() {
+        tempHistory.removeAll(keepingCapacity: false)
+    }
     
     private var lastHistoryRecordTime: Date? = nil
     
@@ -22,6 +38,11 @@ class FanViewModel: ObservableObject {
     var isAppWindowVisible: Bool = false {
         didSet {
             updateTimerFrequency()
+            if isAppWindowVisible {
+                expand()
+            } else {
+                shrink()
+            }
         }
     }
     
@@ -61,7 +82,8 @@ class FanViewModel: ObservableObject {
     private var wasRuleApplied = false
     private var lastSetSpeedPercent: Double? = nil
     
-    private var timer: Timer? = nil
+    private var timerSource: DispatchSourceTimer? = nil
+    private var windowStateTask: Task<Void, Never>? = nil
     
     var helperPath: String {
         let bundleHelper = Bundle.main.bundlePath + "/Contents/MacOS/smc-helper"
@@ -76,7 +98,37 @@ class FanViewModel: ObservableObject {
         loadRules()
         loadHistory()
         checkLaunchAtStartupStatus()
+        setupNotificationObservers()
         startPolling()
+    }
+    
+    private func setupNotificationObservers() {
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(handleWindowNotification), name: NSWindow.didBecomeKeyNotification, object: nil)
+        nc.addObserver(self, selector: #selector(handleWindowNotification), name: NSWindow.didResignKeyNotification, object: nil)
+        nc.addObserver(self, selector: #selector(handleWindowNotification), name: NSWindow.willCloseNotification, object: nil)
+        nc.addObserver(self, selector: #selector(handleWindowNotification), name: NSWindow.didMiniaturizeNotification, object: nil)
+        nc.addObserver(self, selector: #selector(handleWindowNotification), name: NSWindow.didDeminiaturizeNotification, object: nil)
+    }
+    
+    @objc private func handleWindowNotification() {
+        windowStateTask?.cancel()
+        windowStateTask = Task { [weak self] in
+            // Debounce by 100ms to avoid double-triggers from SwiftUI scene reconstruction
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            guard !Task.isCancelled else { return }
+            await self?.updateWindowVisibility()
+        }
+    }
+    
+    private func updateWindowVisibility() {
+        let isVisible = NSApplication.shared.windows.contains { window in
+            guard window.identifier?.rawValue == "main-window" else { return false }
+            return window.isVisible && !window.isMiniaturized
+        }
+        if self.isAppWindowVisible != isVisible {
+            self.isAppWindowVisible = isVisible
+        }
     }
     
     func checkAuthorization() {
@@ -151,87 +203,105 @@ class FanViewModel: ObservableObject {
         let newInterval: TimeInterval
         if isAppWindowVisible || isMenuBarPopoverVisible {
             newInterval = 1.5
-        } else if isRulesEngineEnabled {
-            newInterval = 5.0
         } else {
-            newInterval = 30.0
+            // Idle polling is 5s to capture fan speed spikes
+            newInterval = 5.0
         }
         
-        if timer == nil || abs(currentInterval - newInterval) > 0.01 {
+        if timerSource == nil || abs(currentInterval - newInterval) > 0.01 {
             currentInterval = newInterval
-            timer?.invalidate()
-            timer = Timer.scheduledTimer(withTimeInterval: newInterval, repeats: true) { [weak self] _ in
+            timerSource?.cancel()
+            
+            let source = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+            source.schedule(deadline: .now(), repeating: newInterval, leeway: .milliseconds(100))
+            source.setEventHandler { [weak self] in
                 self?.updateStatus()
             }
+            source.resume()
+            timerSource = source
         }
     }
     
+    nonisolated private func readSMCSnapshot() -> FanSnapshot? {
+        let smc = SMC.shared
+        guard let fanCountVal = smc.getValue("FNum") else { return nil }
+        
+        let fanCount = Int(fanCountVal)
+        var fansList: [FanJSON] = []
+        
+        for i in 0..<fanCount {
+            let name: String
+            if fanCount == 2 {
+                name = i == 0 ? "Left" : "Right"
+            } else if fanCount == 1 {
+                name = "Fan"
+            } else {
+                name = "Fan \(i + 1)"
+            }
+            let current = Int(smc.getValue("F\(i)Ac") ?? 0)
+            let minS = Int(smc.getValue("F\(i)Mn") ?? 0)
+            let maxS = Int(smc.getValue("F\(i)Mx") ?? 0)
+            let target = Int(smc.getValue("F\(i)Tg") ?? 0)
+            
+            let modeKey = smc.fanModeKey(i)
+            let modeVal = Int(smc.getValue(modeKey) ?? 0)
+            let mode = FanMode(rawValue: modeVal) ?? .automatic
+            
+            fansList.append(FanJSON(
+                id: i,
+                name: name,
+                currentSpeed: current,
+                minSpeed: minS,
+                maxSpeed: maxS,
+                targetSpeed: target,
+                mode: mode
+            ))
+        }
+        
+        let cpuKeys = ["TC0P", "TC0D", "TC0F", "TC1C", "TCAD", "TCBD", "Tp09", "Tp0T", "Tp01", "Tp05", "Tp0D", "Tp0C", "Tp0g", "Tp0h", "Te0S"]
+        let gpuKeys = ["TG0D", "TG0H", "TG0P", "Tg05", "Tg0j", "Tg0g", "Tg01", "Tg0c"]
+        let batteryKeys = ["TB0T", "TB1T", "TB2T", "Tw0P", "Ts0P", "Th0H"]
+        
+        func getFirstValidTemp(keys: [String]) -> Double? {
+            for key in keys {
+                if let val = smc.getValue(key), val > 0 && val < 150 { return val }
+            }
+            return nil
+        }
+        
+        let currentCpu = getFirstValidTemp(keys: cpuKeys)
+        let currentGpu = getFirstValidTemp(keys: gpuKeys)
+        let currentBatt = getFirstValidTemp(keys: batteryKeys)
+        
+        return FanSnapshot(
+            fans: fansList,
+            cpuTemp: currentCpu,
+            gpuTemp: currentGpu,
+            batteryTemp: currentBatt,
+            timestamp: Date()
+        )
+    }
+
     func updateStatus() {
         guard !isFetchingStatus else { return }
         isFetchingStatus = true
         
         DispatchQueue.global(qos: .default).async { [weak self] in
-            defer { self?.isFetchingStatus = false }
-            
-            let smc = SMC.shared
-            guard let fanCountVal = smc.getValue("FNum") else { return }
-            
-            let fanCount = Int(fanCountVal)
-            var fansList: [FanJSON] = []
-            
-            for i in 0..<fanCount {
-                let name: String
-                if fanCount == 2 {
-                    name = i == 0 ? "Left" : "Right"
-                } else if fanCount == 1 {
-                    name = "Fan"
-                } else {
-                    name = "Fan \(i + 1)"
-                }
-                let current = Int(smc.getValue("F\(i)Ac") ?? 0)
-                let minS = Int(smc.getValue("F\(i)Mn") ?? 0)
-                let maxS = Int(smc.getValue("F\(i)Mx") ?? 0)
-                let target = Int(smc.getValue("F\(i)Tg") ?? 0)
-                
-                let modeKey = smc.fanModeKey(i)
-                let modeVal = Int(smc.getValue(modeKey) ?? 0)
-                let mode = FanMode(rawValue: modeVal) ?? .automatic
-                
-                fansList.append(FanJSON(
-                    id: i,
-                    name: name,
-                    currentSpeed: current,
-                    minSpeed: minS,
-                    maxSpeed: maxS,
-                    targetSpeed: target,
-                    mode: mode
-                ))
-            }
-            
-            let cpuKeys = ["TC0P", "TC0D", "TC0F", "TC1C", "TCAD", "TCBD", "Tp09", "Tp0T", "Tp01", "Tp05", "Tp0D", "Tp0C", "Tp0g", "Tp0h", "Te0S"]
-            let gpuKeys = ["TG0D", "TG0H", "TG0P", "Tg05", "Tg0j", "Tg0g", "Tg01", "Tg0c"]
-            let batteryKeys = ["TB0T", "TB1T", "TB2T", "Tw0P", "Ts0P", "Th0H"]
-            
-            func getFirstValidTemp(keys: [String]) -> Double? {
-                for key in keys {
-                    if let val = smc.getValue(key), val > 0 && val < 150 { return val }
-                }
-                return nil
-            }
-            
-            let currentCpu = getFirstValidTemp(keys: cpuKeys)
-            let currentGpu = getFirstValidTemp(keys: gpuKeys)
-            let currentBatt = getFirstValidTemp(keys: batteryKeys)
-            
-            DispatchQueue.main.async {
+            autoreleasepool {
                 guard let self = self else { return }
-                self.fans = fansList
-                self.cpuTemp = currentCpu
-                self.gpuTemp = currentGpu
-                self.batteryTemp = currentBatt
-                self.isPollingActive = true
-                self.evaluateRules()
-                self.recordHistoryIfNeeded()
+                let newSnapshot = self.readSMCSnapshot()
+                
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    if let newSnapshot = newSnapshot {
+                        self.snapshot = newSnapshot
+                        self.isPollingActive = true
+                        self.updateRingBuffer()
+                        self.evaluateRules()
+                        self.recordHistoryIfNeeded()
+                    }
+                    self.isFetchingStatus = false
+                }
             }
         }
     }
@@ -436,18 +506,30 @@ class FanViewModel: ObservableObject {
     }
     
     // MARK: - Temperature History Management
+    private func updateRingBuffer() {
+        let now = Date()
+        guard snapshot.cpuTemp != nil || snapshot.gpuTemp != nil || snapshot.batteryTemp != nil else { return }
+        
+        let record = TempRecord(timestamp: now, cpu: snapshot.cpuTemp, gpu: snapshot.gpuTemp, battery: snapshot.batteryTemp)
+        ringBuffer.append(record)
+        if ringBuffer.count > 10 {
+            ringBuffer.removeFirst()
+        }
+    }
+    
     private func recordHistoryIfNeeded() {
+        guard isAppWindowVisible else { return }
         let now = Date()
         
         // Ensure we have at least one valid reading
-        guard cpuTemp != nil || gpuTemp != nil || batteryTemp != nil else { return }
+        guard snapshot.cpuTemp != nil || snapshot.gpuTemp != nil || snapshot.batteryTemp != nil else { return }
         
         if let lastTime = lastHistoryRecordTime {
             // Only record every 30 seconds to avoid bloating
             guard now.timeIntervalSince(lastTime) >= 30.0 else { return }
         }
         
-        let record = TempRecord(timestamp: now, cpu: cpuTemp, gpu: gpuTemp, battery: batteryTemp)
+        let record = TempRecord(timestamp: now, cpu: snapshot.cpuTemp, gpu: snapshot.gpuTemp, battery: snapshot.batteryTemp)
         tempHistory.append(record)
         lastHistoryRecordTime = now
         
@@ -510,7 +592,8 @@ class FanViewModel: ObservableObject {
     }
     
     deinit {
-        timer?.invalidate()
-        timer = nil
+        timerSource?.cancel()
+        timerSource = nil
+        NotificationCenter.default.removeObserver(self)
     }
 }
