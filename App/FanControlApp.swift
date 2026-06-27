@@ -20,8 +20,9 @@ struct FanControlApp: App {
         MenuBarExtra {
             MenuBarPopoverView(viewModel: viewModel)
         } label: {
-            if let firstFan = viewModel.fans.first {
-                createMenuIcon(speed: firstFan.currentSpeed)
+            if !viewModel.fans.isEmpty {
+                let maxSpeed = viewModel.fans.map { $0.currentSpeed }.max() ?? 0
+                createMenuIcon(speed: maxSpeed)
             } else {
                 Image(systemName: "fan.fill")
             }
