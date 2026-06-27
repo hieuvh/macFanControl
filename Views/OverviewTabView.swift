@@ -48,7 +48,7 @@ struct OverviewTabView: View {
                 
                 // Hero Fans Section
                 if !viewModel.fans.isEmpty {
-                    LazyVGrid(columns: fanColumns, spacing: 24) {
+                    LazyHGrid(rows: fanColumns, spacing: 24) {
                         ForEach(viewModel.fans) { fan in
                             HeroFanDial(fan: fan, viewModel: viewModel)
                         }

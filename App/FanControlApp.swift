@@ -23,15 +23,13 @@ struct FanControlApp: App {
         } label: {
             HStack(spacing: 4) {
                 if let firstFan = viewModel.fans.first {
-                    SpinningFanView(currentSpeed: Double(firstFan.currentSpeed), maxSpeed: Double(firstFan.maxSpeed), size: 14)
-                    
+                    Image(systemName: "fan.fill")
+                        .font(.system(size: 14))
+                        .rotationEffect(.degrees(Double(firstFan.currentSpeed) / Double(firstFan.maxSpeed) * 360))
+
                     Text(String(firstFan.currentSpeed))
                         .animatableNumber(value: Double(firstFan.currentSpeed))
                         .font(.system(size: 10, weight: .bold))
-                    Image(systemName: "fan.fill")
-                        .font(.system(size: 14))
-                        .rotationEffect(.degrees(90))
-
                 } else {
                     Text("--")
                         .font(.system(size: 10, weight: .bold))
