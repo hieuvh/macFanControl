@@ -50,8 +50,8 @@ struct HeroFanDial: View {
                     onEditingChanged: { editing in
                         isEditingSlider = editing
                         if editing {
-                            if fan.mode != 1 {
-                                viewModel.changeFanMode(fanId: fan.id, mode: 1)
+                            if fan.mode != .forced {
+                                viewModel.changeFanMode(fanId: fan.id, mode: .forced)
                             }
                         } else {
                             viewModel.changeFanSpeed(fanId: fan.id, speed: Int(sliderVal))
@@ -136,16 +136,16 @@ struct HeroFanDial: View {
     }
     
     func presetButton(title: String, isAuto: Bool = false, val: Double = 0) -> some View {
-        let isActive = isAuto ? (fan.mode == 0) : (fan.mode == 1 && abs(sliderVal - val) <= 2.0)
+        let isActive = isAuto ? (fan.mode == .automatic) : (fan.mode == .forced && abs(sliderVal - val) <= 2.0)
         
         return Button(action: {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 if isAuto {
-                    viewModel.changeFanMode(fanId: fan.id, mode: 0)
+                    viewModel.changeFanMode(fanId: fan.id, mode: .automatic)
                 } else {
                     sliderVal = val
-                    if fan.mode != 1 {
-                        viewModel.changeFanMode(fanId: fan.id, mode: 1)
+                    if fan.mode != .forced {
+                        viewModel.changeFanMode(fanId: fan.id, mode: .forced)
                     }
                     viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
                 }

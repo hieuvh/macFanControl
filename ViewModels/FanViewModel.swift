@@ -152,7 +152,8 @@ class FanViewModel: ObservableObject {
                 let target = Int(smc.getValue("F\(i)Tg") ?? 0)
                 
                 let modeKey = smc.fanModeKey(i)
-                let mode = Int(smc.getValue(modeKey) ?? 0)
+                let modeVal = Int(smc.getValue(modeKey) ?? 0)
+                let mode = FanMode(rawValue: modeVal) ?? .automatic
                 
                 fansList.append(FanJSON(
                     id: i,
@@ -193,7 +194,7 @@ class FanViewModel: ObservableObject {
         }
     }
     
-    func setFanMode(fanId: Int, mode: Int, speed: Int? = nil) {
+    func setFanMode(fanId: Int, mode: FanMode, speed: Int? = nil) {
         let path = helperPath
         guard FileManager.default.fileExists(atPath: path) else { return }
         
@@ -201,8 +202,8 @@ class FanViewModel: ObservableObject {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: path)
             
-            var args = ["set", "\(fanId)", "\(mode)"]
-            if mode == 1, let spd = speed {
+            var args = ["set", "\(fanId)", "\(mode.rawValue)"]
+            if mode == .forced, let spd = speed {
                 args.append("\(spd)")
             }
             task.arguments = args
@@ -216,23 +217,23 @@ class FanViewModel: ObservableObject {
         }
     }
     
-    func changeFanMode(fanId: Int, mode: Int) {
+    func changeFanMode(fanId: Int, mode: FanMode) {
         if linkedFans {
             for i in 0..<fans.count {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     fans[i].mode = mode
-                    if mode == 1 { fans[i].targetSpeed = fans[i].minSpeed }
+                    if mode == .forced { fans[i].targetSpeed = fans[i].minSpeed }
                 }
-                let targetSpeed = mode == 1 ? fans[i].minSpeed : nil
+                let targetSpeed = mode == .forced ? fans[i].minSpeed : nil
                 setFanMode(fanId: fans[i].id, mode: mode, speed: targetSpeed)
             }
         } else {
             if let i = fans.firstIndex(where: { $0.id == fanId }) {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     fans[i].mode = mode
-                    if mode == 1 { fans[i].targetSpeed = fans[i].minSpeed }
+                    if mode == .forced { fans[i].targetSpeed = fans[i].minSpeed }
                 }
-                let targetSpeed = mode == 1 ? fans[i].minSpeed : nil
+                let targetSpeed = mode == .forced ? fans[i].minSpeed : nil
                 setFanMode(fanId: fanId, mode: mode, speed: targetSpeed)
             }
         }
@@ -250,19 +251,19 @@ class FanViewModel: ObservableObject {
                 let boundedSpeed = min(max(Int(targetSpeed), fans[i].minSpeed), fans[i].maxSpeed)
                 
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    fans[i].mode = 1
+                    fans[i].mode = .forced
                     fans[i].targetSpeed = boundedSpeed
                 }
-                setFanMode(fanId: fans[i].id, mode: 1, speed: boundedSpeed)
+                setFanMode(fanId: fans[i].id, mode: .forced, speed: boundedSpeed)
             }
         } else {
             if let i = fans.firstIndex(where: { $0.id == fanId }) {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    fans[i].mode = 1
+                    fans[i].mode = .forced
                     fans[i].targetSpeed = speed
                 }
             }
-            setFanMode(fanId: fanId, mode: 1, speed: speed)
+            setFanMode(fanId: fanId, mode: .forced, speed: speed)
         }
     }
     
@@ -272,7 +273,7 @@ class FanViewModel: ObservableObject {
         
         for i in 0..<fans.count {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                fans[i].mode = 0
+                fans[i].mode = .automatic
             }
         }
         
@@ -300,17 +301,17 @@ class FanViewModel: ObservableObject {
             let speed = Int(targetSpeed)
             
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                fans[i].mode = 1
+                fans[i].mode = .forced
                 fans[i].targetSpeed = speed
             }
-            setFanMode(fanId: fans[i].id, mode: 1, speed: speed)
+            setFanMode(fanId: fans[i].id, mode: .forced, speed: speed)
         }
     }
     
     func syncAllFans(toSpeed speed: Int) {
         for i in 0..<fans.count {
-            if fans[i].mode != 1 {
-                changeFanMode(fanId: fans[i].id, mode: 1)
+            if fans[i].mode != .forced {
+                changeFanMode(fanId: fans[i].id, mode: .forced)
             }
             changeFanSpeed(fanId: fans[i].id, speed: speed)
         }

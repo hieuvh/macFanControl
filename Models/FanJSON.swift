@@ -8,7 +8,7 @@ struct FanJSON: Codable, Identifiable {
     let minSpeed: Int
     let maxSpeed: Int
     var targetSpeed: Int
-    var mode: Int
+    var mode: FanMode
 }
 
 struct SystemStatusJSON: Codable {
