@@ -22,7 +22,7 @@ struct TempMetricCard: View {
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.system(size: 9, weight: .medium))
                     .foregroundColor(isSelected ? .white : .gray)
                     .textCase(.uppercase)
                     .lineLimit(1)
@@ -30,13 +30,13 @@ struct TempMetricCard: View {
                 
                 if let t = temp {
                     Text(String(format: "%.1f°C", t))
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
                         .foregroundColor(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 } else {
                     Text("--")
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
                         .foregroundColor(.gray)
                         .lineLimit(1)
                 }
@@ -45,7 +45,7 @@ struct TempMetricCard: View {
             Spacer(minLength: 4)
             
             Image(systemName: "chevron.down")
-                .font(.system(size: 9, weight: .bold))
+                .font(.system(size: 9, weight: .medium))
                 .foregroundColor(isSelected ? iconColor : Color.white.opacity(0.15))
                 .rotationEffect(.degrees(isSelected ? 180 : 0))
                 .padding(.trailing, 2)
