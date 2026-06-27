@@ -3,9 +3,14 @@ import AppKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Close the default blank window created by SwiftUI at launch
+        // Close only the default blank window created by SwiftUI at launch, preserving MenuBarExtra windows
         for window in NSApplication.shared.windows {
-            window.close()
+            let isTitled = window.styleMask.contains(.titled)
+            print("Detected window: \(window), title: '\(window.title)', styleMask: \(window.styleMask.rawValue), isTitled: \(isTitled)")
+            if isTitled {
+                print("Closing main window group window: \(window)")
+                window.close()
+            }
         }
     }
 }
