@@ -16,39 +16,8 @@ struct MenuBarPopoverView: View {
             
             // Middle Section: Fans / Authorization
             if !viewModel.isAuthorized {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.orange)
-                            .font(.system(size: 14))
-                        Text("Authorization required")
-                            .font(.system(size: 12, weight: .semibold))
-                    }
-                    
-                    Text("Authorize to manage fans and read sensors.")
-                        .font(.system(size: 11))
-                        .foregroundColor(.gray)
-                    
-                    Button(action: { viewModel.authorize() }) {
-                        Text("Authorize")
-                            .font(.system(size: 11, weight: .medium))
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 12)
-                            .background(Color.orange)
-                            .foregroundColor(.black)
-                            .cornerRadius(6)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                }
-                .padding(12)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.orange.opacity(0.1))
-                .cornerRadius(8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.orange.opacity(0.3), lineWidth: 1)
-                )
-                .padding(.horizontal)
+                AuthorizationRequiredCard(viewModel: viewModel, compact: true)
+                    .padding(.horizontal)
             } else {
                 VStack(spacing: 12) {
                     ForEach(viewModel.fans) { fan in

@@ -11,39 +11,7 @@ struct OverviewTabView: View {
         ScrollView {
             VStack(spacing: 24) {
                 if !viewModel.isAuthorized {
-                    // Privilege setup card
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
-                                .font(.system(size: 20))
-                            Text("Authorization required")
-                                .font(.system(size: 14, weight: .semibold))
-                        }
-                        
-                        Text("Authorize to manage fan speeds and read hardware sensors.")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                        
-                        Button(action: { viewModel.authorize() }) {
-                            Text("Authorize")
-                                .font(.system(size: 12, weight: .medium))
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 16)
-                                .background(Color.white.opacity(0.1))
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.03))
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                    )
+                    AuthorizationRequiredCard(viewModel: viewModel)
                 }
                 
                 // Hero Fans Section
