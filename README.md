@@ -1,6 +1,6 @@
 # macOS Fan Control Utility
 
-A sleek, native SwiftUI macOS application designed for real-time monitoring and manual/automated control of MacBook fan speeds. Compatible with both Intel and Apple Silicon (M1/M2/M3/M4/M5+) architectures.
+A sleek, native SwiftUI macOS application designed for real-time monitoring and manual/automated control of MacBook fan speeds. Compatible exclusively with Apple Silicon (M1/M2/M3/M4/M5+) architectures (Intel processors are not supported).
 
 ![Main dashboard](screenshot.png)
 
@@ -75,7 +75,7 @@ chmod +x build.sh
 
 This compiles `smc-helper` and `FanControl`, drafts the app metadata (`Info.plist`), and processes visual assets to output a standard application bundle: **`Fan Control.app`** and a compressed **`Fan Control.zip`** ready for distribution.
 
-By default, the build script pins the app and helper binaries to macOS 13.0 and creates a Universal 2 bundle for both Intel and Apple Silicon Macs. You can override those defaults:
+By default, the build script pins the app and helper binaries to macOS 13.0 and compiles for Apple Silicon (arm64) architectures. You can override those defaults:
 
 ```bash
 MACOS_DEPLOYMENT_TARGET=14.0 ARCHS="arm64" ./build.sh
