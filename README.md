@@ -17,10 +17,13 @@ It features a dual-component design: a sandboxed SwiftUI GUI front-end that comm
 
 - **Real-Time RPM Monitor**: Displays actual fan speeds with a custom rotating vector fan blade animation that responds to changes in RPM.
 - **Auto-Trigger Rules Engine**: Set custom, automated temperature rules for **CPU**, **GPU**, or **Battery** (e.g., _if CPU ≥ 75°C, override all fans to 80%_). Multiple active rules are evaluated dynamically, prioritizing the highest safety speed, and automatically returning control to macOS once the sensors cool down.
-- **Manual Mode Controls**: Precise target speed adjustment sliders.
-- **Quick Presets**: Set speed thresholds instantly using the **Min**, **20%**, **50%**, **80%**, or **Max** buttons.
+- **Manual Mode Controls**: Precise target speed adjustment dial.
+- **Quick Presets**: Set speed thresholds instantly using the **Auto**, **20%**, **50%**, **80%**, or **Max** buttons, optimized with immediate single-write activation.
 - **Linked Fan Tuning**: Option to sync adjustments across all system fans simultaneously.
+- **Launch at Startup**: Built-in toggle in Settings using macOS Ventura's native `SMAppService` API to register the application on login.
 - **System Metrics**: Monitors battery and sensor temperatures alongside active speed states.
+- **Status Menu Bar Extra**: Prompt for root privileges directly from the popover dropdown, view telemetry, and apply preset speed overrides.
+- **Ultra Performance & Battery Saving**: Scales down polling loops in the background (5.0s / 30.0s), pauses CPU drawing timelines when the app window/popover is hidden, caches menu bar drawings, and computes chart statistics in a single O(N) loop traversal.
 - **Safety Mode**: Instantly yields control back to macOS automatic management when closed or reset.
 
 ---
@@ -33,11 +36,16 @@ The codebase is organized into clean, single-responsibility files conforming to 
 - 📂 **`Models/`**: Shared structs (`FanJSON.swift`) describing deserialized telemetry packages and auto-rules.
 - 📂 **`ViewModels/`**: Orchestration logic (`FanViewModel.swift`) querying sensors, checking authorization, persisting rules, and evaluating automatic triggers.
 - 📂 **`Views/`**: Reusable SwiftUI layout pieces.
-  - `SpinningFanView.swift`: Animated vector fan widget.
-  - `TempMetricCard.swift`: Temperature telemetry indicators.
-  - `FanControlRow.swift`: Single-fan state picking and speed slider row.
-  - `RulesEngineView.swift`: Dynamic rules addition board.
-  - `ContentView.swift`: Window layout coordinator.
+  - `AuthorizationRequiredCard.swift`: Reusable privilege authorization card.
+  - `CompactSensorCard.swift`: Glassmorphic sensor temperature display cards.
+  - `ContentView.swift`: Main window structure and tab navigation sidebar.
+  - `HeroFanDial.swift`: Interactive fan dial and quick preset controls.
+  - `MenuBarPopoverView.swift`: Status bar dropdown layout and controls.
+  - `OverviewTabView.swift`: Dashboard grids.
+  - `RulesEngineView.swift`: Advanced autotarget rules setup board.
+  - `SettingsTabView.swift`: Startup and link fans toggles.
+  - `SpinningFanView.swift`: Timeline animatable vector fan blade widget.
+  - `TempHistoryChartView.swift`: Single-pass O(N) temperature log graph.
 - 📂 **`App/`**: Application Entry Scene (`FanControlApp.swift`) coordinating regular activation and system Menu Bar Extra tray access.
 - 📂 **`Helper/`**: Privilege operations wrapper (`main.swift`) serving as a setuid execution client.
 
