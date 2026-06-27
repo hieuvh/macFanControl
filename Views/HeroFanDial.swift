@@ -34,11 +34,11 @@ struct HeroFanDial: View {
                 // Slider Label
                 HStack {
                     Text("Target")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.gray)
                     Spacer()
                     Text(verbatim: "\(Int(sliderVal)) RPM")
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
                         .foregroundColor(.teal)
                 }
                 
@@ -73,7 +73,7 @@ struct HeroFanDial: View {
             // Title and Spinning Fan Icon
             HStack {
                 Text(fan.name)
-                    .font(.system(size: 18, weight: .black))
+                    .font(.system(size: 15, weight: .medium))
             }
             .padding(.vertical, 20)
         }
@@ -151,7 +151,7 @@ struct HeroFanDial: View {
             }
         }) {
             Text(title)
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .foregroundColor(isActive ? .teal : .white)
