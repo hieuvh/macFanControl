@@ -21,6 +21,9 @@ struct SettingsTabView: View {
                     Toggle("Link fans", isOn: $viewModel.linkedFans)
                         .toggleStyle(SwitchToggleStyle(tint: .teal))
                     
+                    Toggle("Launch at startup", isOn: $viewModel.launchAtStartup)
+                        .toggleStyle(SwitchToggleStyle(tint: .teal))
+                    
                     Button(action: { viewModel.resetAll() }) {
                         Text("Reset to auto")
                             .font(.system(size: 12, weight: .medium))
