@@ -5,6 +5,7 @@ struct SpinningFanView: View, Animatable {
     var currentSpeed: Double
     let maxSpeed: Double
     var size: CGFloat = 80 // Default size for main app
+    var isActive: Bool = true
     @State private var angle: Double = 0.0
     
     var animatableData: Double {
@@ -13,7 +14,7 @@ struct SpinningFanView: View, Animatable {
     }
     
     var body: some View {
-        TimelineView(.animation(paused: currentSpeed == 0)) { timeline in
+        TimelineView(.animation(paused: currentSpeed == 0 || !isActive)) { timeline in
             Image(systemName: "fan.fill")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
