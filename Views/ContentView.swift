@@ -40,8 +40,9 @@ struct ContentView: View {
                 Spacer()
             }
             .padding(24)
-            .frame(width: 200)
+            .frame(width: 220)
             .background(Color.black.opacity(0.3))
+            .layoutPriority(1)
             
             // Main Content Area
             ZStack {
@@ -61,7 +62,7 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 800, minHeight: 600)
+        .frame(minWidth: 900, minHeight: 650)
         .background(Color(red: 0.04, green: 0.04, blue: 0.05))
         .background(WindowAccessor { window in
             window.delegate = MainWindowDelegate.shared

@@ -173,6 +173,8 @@ struct HeroFanDial: View {
         }) {
             Text(title)
                 .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .foregroundColor(isActive ? .teal : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 6)
