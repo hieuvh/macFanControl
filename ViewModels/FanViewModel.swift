@@ -117,7 +117,7 @@ class FanViewModel: ObservableObject {
             // Debounce by 100ms to avoid double-triggers from SwiftUI scene reconstruction
             try? await Task.sleep(nanoseconds: 100_000_000)
             guard !Task.isCancelled else { return }
-            await self?.updateWindowVisibility()
+            self?.updateWindowVisibility()
         }
     }
     

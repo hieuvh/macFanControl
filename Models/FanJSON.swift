@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Models for JSON Parsing
-struct FanJSON: Codable, Identifiable {
+struct FanJSON: Codable, Identifiable, Equatable {
     let id: Int
     let name: String
     var currentSpeed: Int
@@ -85,14 +85,14 @@ struct TriggerRule: Identifiable, Codable, Hashable {
     }
 }
 
-public struct FanSnapshot: Codable, Equatable {
-    public let fans: [FanJSON]
-    public let cpuTemp: Double?
-    public let gpuTemp: Double?
-    public let batteryTemp: Double?
-    public let timestamp: Date
+struct FanSnapshot: Codable, Equatable {
+    var fans: [FanJSON]
+    let cpuTemp: Double?
+    let gpuTemp: Double?
+    let batteryTemp: Double?
+    let timestamp: Date
 
-    public init(
+    init(
         fans: [FanJSON],
         cpuTemp: Double?,
         gpuTemp: Double?,
