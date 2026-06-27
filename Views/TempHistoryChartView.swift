@@ -17,7 +17,7 @@ struct TempHistoryChartView: View {
     var sensorColor: Color {
         switch sensor {
         case .cpu: return .orange
-        case .gpu: return .purple
+        case .gpu: return .indigo
         case .battery: return .green
         }
     }

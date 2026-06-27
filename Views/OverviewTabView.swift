@@ -65,7 +65,7 @@ struct OverviewTabView: View {
                     .buttonStyle(PlainButtonStyle())
                     
                     Button(action: { toggleChart(for: .gpu) }) {
-                        CompactSensorCard(title: "GPU", temp: viewModel.gpuTemp, iconName: "gauge.with.needle", color: .purple)
+                        CompactSensorCard(title: "GPU", temp: viewModel.gpuTemp, iconName: "gauge.with.needle", color: .indigo)
                     }
                     .buttonStyle(PlainButtonStyle())
                     
