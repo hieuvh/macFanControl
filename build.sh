@@ -172,17 +172,16 @@ codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$MACOS_DIR/$APP_E
 codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$APP_DIR"
 
 # 8. Create DMG disk image
-echo "Packaging to DMG..."
-rm -f "Fan Control.dmg"
+echo "Packaging to ZIP..."
+rm -f "Fan Control.zip"
 rm -rf dist
 mkdir -p dist
 cp -R "$APP_DIR" dist/
-# Add a symbolic link to /Applications for easy drag-and-drop installation
-ln -s /Applications dist/Applications
-hdiutil create -volname "Fan Control v2.0" -srcfolder dist -ov -format UDZO "Fan Control.dmg"
+cd dist
+zip -ryq "../Fan Control.zip" "Fan Control.app"
+cd ..
 rm -rf dist
 
-echo "Codesigning DMG..."
-codesign --force --sign "$SIGNING_IDENTITY" "Fan Control.dmg"
+echo "Codesigning ZIP is not strictly required, skipping..."
 
-echo "=== Build and Packaging Complete: 'Fan Control.dmg' created successfully ==="
+echo "=== Build and Packaging Complete: 'Fan Control.zip' created successfully ==="
