@@ -21,39 +21,46 @@ struct FanControlApp: App {
         MenuBarExtra {
             MenuBarPopoverView(viewModel: viewModel)
         } label: {
-            HStack(spacing: 4) {
-                if let firstFan = viewModel.fans.first {
-                    Image(systemName: "fan.fill")
-                        .font(.system(size: 14))
-                        // .rotationEffect(.degrees(Double(firstFan.currentSpeed) / Double(firstFan.maxSpeed) * 360))
-                        
-                    HStack(spacing: 2) {
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(firstFan.currentSpeed > 0 ? Color.white : Color.gray.opacity(0.3))
-                            .frame(width: 3, height: 14)
-                        
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(firstFan.currentSpeed >= 3000 ? Color.yellow : Color.gray.opacity(0.3))
-                            .frame(width: 3, height: 14)
-                        
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(firstFan.currentSpeed >= 5000 ? Color.red : Color.gray.opacity(0.3))
-                            .frame(width: 3, height: 14)
-                    }
-                    // .padding(.trailing, 2)
-                    // .animatableNumber(value: Double(firstFan.currentSpeed))
-
-                    // Text(String(firstFan.currentSpeed))
-                    //     .animatableNumber(value: Double(firstFan.currentSpeed))
-                    //     .font(.system(size: 10, weight: .bold))
-                } else {
-                    Text("--")
-                        .font(.system(size: 10, weight: .bold))
-                }
+            if let firstFan = viewModel.fans.first {
+                createMenuIcon(speed: firstFan.currentSpeed)
+                Text("\(firstFan.currentSpeed) RPM")
+            } else {
+                Image(systemName: "fan.fill")
+                Text("--")
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 2)
         }
         .menuBarExtraStyle(.window)
+    }
+    
+    @MainActor
+    private func createMenuIcon(speed: Int) -> Image {
+        let view = HStack(spacing: 4) {
+            Image(systemName: "fan.fill")
+                .font(.system(size: 14))
+                .foregroundColor(.primary)
+            
+            HStack(spacing: 2) {
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(speed > 0 ? Color.white : Color.gray.opacity(0.3))
+                    .frame(width: 3, height: 14)
+                
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(speed >= 3000 ? Color.yellow : Color.gray.opacity(0.3))
+                    .frame(width: 3, height: 14)
+                
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(speed >= 5000 ? Color.red : Color.gray.opacity(0.3))
+                    .frame(width: 3, height: 14)
+            }
+        }
+        
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = NSApplication.shared.windows.first?.backingScaleFactor ?? 2.0
+        
+        if let nsImage = renderer.nsImage {
+            return Image(nsImage: nsImage)
+        }
+        
+        return Image(systemName: "fan.fill")
     }
 }
