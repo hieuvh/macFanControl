@@ -53,19 +53,33 @@ struct TempHistoryChartView: View {
         return f
     }
     
-    var body: some View {
-        // Map all available history points to sensor values
-        let points = history
-            .compactMap { record -> ChartPoint? in
-                if let val = valueForSensor(record) {
-                    return ChartPoint(time: record.timestamp, value: val)
-                }
-                return nil
+    private func calculateStats() -> (points: [ChartPoint], min: Double, max: Double, avg: Double) {
+        let points = history.compactMap { record -> ChartPoint? in
+            if let val = valueForSensor(record) {
+                return ChartPoint(time: record.timestamp, value: val)
             }
+            return nil
+        }
         
-        let statsMin = points.map { $0.value }.min() ?? 0
-        let statsMax = points.map { $0.value }.max() ?? 0
-        let statsAvg = points.isEmpty ? 0 : points.map { $0.value }.reduce(0, +) / Double(points.count)
+        guard !points.isEmpty else { return ([], 0, 0, 0) }
+        
+        var minVal = points[0].value
+        var maxVal = points[0].value
+        var sumVal: Double = 0
+        for pt in points {
+            if pt.value < minVal { minVal = pt.value }
+            if pt.value > maxVal { maxVal = pt.value }
+            sumVal += pt.value
+        }
+        return (points, minVal, maxVal, sumVal / Double(points.count))
+    }
+    
+    var body: some View {
+        let stats = calculateStats()
+        let points = stats.points
+        let statsMin = stats.min
+        let statsMax = stats.max
+        let statsAvg = stats.avg
         
         VStack(spacing: 14) {
             // Header: Title + Sensor Type + Close button
