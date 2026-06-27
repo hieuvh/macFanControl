@@ -9,7 +9,7 @@ enum DashboardTab {
 
 struct ContentView: View {
     @ObservedObject var viewModel: FanViewModel
-    @State private var selectedTab: DashboardTab = .overview
+    
     
     var body: some View {
         HStack(spacing: 0) {
@@ -22,16 +22,16 @@ struct ContentView: View {
                 }
                 .padding(.bottom, 20)
                 
-                SidebarButton(title: "Overview", icon: "square.grid.2x2.fill", isSelected: selectedTab == .overview) {
-                    selectedTab = .overview
+                SidebarButton(title: "Overview", icon: "square.grid.2x2.fill", isSelected: viewModel.selectedTab == .overview) {
+                    viewModel.selectedTab = .overview
                 }
                 
-                SidebarButton(title: "Rules", icon: "bolt.fill", isSelected: selectedTab == .rules) {
-                    selectedTab = .rules
+                SidebarButton(title: "Rules", icon: "bolt.fill", isSelected: viewModel.selectedTab == .rules) {
+                    viewModel.selectedTab = .rules
                 }
                 
-                SidebarButton(title: "Settings", icon: "gearshape.fill", isSelected: selectedTab == .settings) {
-                    selectedTab = .settings
+                SidebarButton(title: "Settings", icon: "gearshape.fill", isSelected: viewModel.selectedTab == .settings) {
+                    viewModel.selectedTab = .settings
                 }
                 
                 Spacer()
@@ -45,7 +45,7 @@ struct ContentView: View {
             ZStack {
                 Color(red: 0.04, green: 0.04, blue: 0.05).edgesIgnoringSafeArea(.all)
                 
-                switch selectedTab {
+                switch viewModel.selectedTab {
                 case .overview:
                     OverviewTabView(viewModel: viewModel)
                 case .rules:
