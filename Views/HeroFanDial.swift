@@ -22,10 +22,10 @@ struct HeroFanDial: View {
             
             
             // Hero Circular Dial
-            // ZStack {
-                // Circle()
-                //     .stroke(Color.white.opacity(0.1), lineWidth: 10)
-                //     .frame(width: 150, height: 150)
+            ZStack {
+                Circle()
+                    .stroke(Color.white.opacity(0.1), lineWidth: 10)
+                    .frame(width: 150, height: 150)
                 
                 // Circle()
                 //     .trim(from: 0, to: CGFloat(animatableSpeed) / CGFloat(fan.maxSpeed > 0 ? fan.maxSpeed : 6000))
@@ -43,8 +43,8 @@ struct HeroFanDial: View {
                 //         .font(.system(size: 14, weight: .bold))
                 //         .foregroundColor(.gray)
                 // }
-            // }
-            // .padding(.vertical, 10)
+            }
+            .padding(.vertical, 10)
             
             // Speed Controls
             VStack(spacing: 12) {
