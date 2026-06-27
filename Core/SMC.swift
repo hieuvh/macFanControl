@@ -40,7 +40,7 @@ internal enum SMCKeys: UInt8 {
     case readVers = 12
 }
 
-public enum FanMode: Int, Codable {
+public enum FanMode: Int, Codable, Sendable {
     case automatic = 0
     case forced = 1
     case auto3 = 3
