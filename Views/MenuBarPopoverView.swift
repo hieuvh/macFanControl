@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MenuBarPopoverView: View {
     @ObservedObject var viewModel: FanViewModel
+    @Environment(\.openWindow) private var openWindow
     
     var body: some View {
         VStack(spacing: 15) {
@@ -105,10 +106,14 @@ struct MenuBarPopoverView: View {
     }
     
     private func openMainWindow() {
-        NSApplication.shared.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
-        if let window = NSApplication.shared.windows.first {
-            window.makeKeyAndOrderFront(nil)
+        viewModel.isAppWindowVisible = true
+        openWindow(id: "main-window")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == "main-window" }) {
+                window.makeKeyAndOrderFront(nil)
+            }
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
 }
