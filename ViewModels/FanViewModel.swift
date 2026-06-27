@@ -33,6 +33,8 @@ class FanViewModel: ObservableObject {
     
     private var currentInterval: TimeInterval = 1.5
     
+    @Published var selectedTab: DashboardTab = .overview
+    
     @Published var launchAtStartup: Bool = false {
         didSet {
             guard launchAtStartup != oldValue else { return }
