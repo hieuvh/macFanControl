@@ -25,26 +25,27 @@ struct FanControlApp: App {
                 if let firstFan = viewModel.fans.first {
                     Image(systemName: "fan.fill")
                         .font(.system(size: 14))
-                        .rotationEffect(.degrees(Double(firstFan.currentSpeed) / Double(firstFan.maxSpeed) * 360))
+                        // .rotationEffect(.degrees(Double(firstFan.currentSpeed) / Double(firstFan.maxSpeed) * 360))
                         
-                    HStack(alignment: .bottom, spacing: 2) {
+                    HStack(spacing: 2) {
                         RoundedRectangle(cornerRadius: 1)
                             .fill(firstFan.currentSpeed > 0 ? Color.white : Color.gray.opacity(0.3))
-                            .frame(width: 3, height: 6)
+                            .frame(width: 3, height: 14)
                         
                         RoundedRectangle(cornerRadius: 1)
                             .fill(firstFan.currentSpeed >= 3000 ? Color.yellow : Color.gray.opacity(0.3))
-                            .frame(width: 3, height: 9)
+                            .frame(width: 3, height: 14)
                         
                         RoundedRectangle(cornerRadius: 1)
                             .fill(firstFan.currentSpeed >= 5000 ? Color.red : Color.gray.opacity(0.3))
-                            .frame(width: 3, height: 12)
+                            .frame(width: 3, height: 14)
                     }
-                    .padding(.trailing, 2)
+                    // .padding(.trailing, 2)
+                    // .animatableNumber(value: Double(firstFan.currentSpeed))
 
-                    Text(String(firstFan.currentSpeed))
-                        .animatableNumber(value: Double(firstFan.currentSpeed))
-                        .font(.system(size: 10, weight: .bold))
+                    // Text(String(firstFan.currentSpeed))
+                    //     .animatableNumber(value: Double(firstFan.currentSpeed))
+                    //     .font(.system(size: 10, weight: .bold))
                 } else {
                     Text("--")
                         .font(.system(size: 10, weight: .bold))

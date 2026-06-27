@@ -62,7 +62,7 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 900, minHeight: 650)
+        .frame(minWidth: 600, idealWidth: 800, minHeight: 500, idealHeight: 650)
         .background(Color(red: 0.04, green: 0.04, blue: 0.05))
         .background(WindowAccessor { window in
             window.delegate = MainWindowDelegate.shared

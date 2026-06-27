@@ -48,10 +48,15 @@ struct OverviewTabView: View {
                 
                 // Hero Fans Section
                 if !viewModel.fans.isEmpty {
-                    LazyHGrid(rows: fanColumns, spacing: 24) {
-                        ForEach(viewModel.fans) { fan in
-                            HeroFanDial(fan: fan, viewModel: viewModel)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHGrid(rows: [GridItem(.flexible())], spacing: 24) {
+                            ForEach(viewModel.fans) { fan in
+                                HeroFanDial(fan: fan, viewModel: viewModel)
+                                    .frame(minWidth: 320, maxWidth: 450)
+                            }
                         }
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 8)
                     }
                 }
                 
@@ -88,6 +93,8 @@ struct OverviewTabView: View {
                 }
             }
             .padding(32)
+            .frame(maxWidth: 800)
+            .frame(maxWidth: .infinity)
             .animation(.easeInOut(duration: 0.3), value: selectedChart)
         }
     }
