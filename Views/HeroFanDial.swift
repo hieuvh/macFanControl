@@ -37,17 +37,10 @@ struct HeroFanDial: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.gray)
                     Spacer()
-                    if fan.mode == 0 {
-                        Text(verbatim: "Auto (\(Int(animatableSpeed)) RPM)")
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .foregroundColor(.teal)
-                            .contentTransition(.numericText())
-                    } else {
-                        Text(verbatim: "\(Int(sliderVal)) RPM (\(Int(speedPercentage))%)")
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .foregroundColor(.teal)
-                            .contentTransition(.numericText())
-                    }
+                    Text(verbatim: "\(Int(sliderVal)) RPM")
+                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .foregroundColor(.teal)
+                        .contentTransition(.numericText())
                 }
                 
                 // Slider

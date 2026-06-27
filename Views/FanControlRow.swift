@@ -31,10 +31,10 @@ struct FanControlRow: View {
                         .foregroundColor(.white)
                     
                     HStack(spacing: 8) {
-                        Text("")
-                            .animatableNumber(value: animatableSpeed)
+                        Text(verbatim: "\(Int(animatableSpeed))")
                             .font(.system(size: 26, weight: .black, design: .monospaced))
                             .foregroundColor(rpmColor)
+                            .contentTransition(.numericText())
                         Text("RPM")
                             .font(.system(size: 12, weight: .bold))
                             .tracking(1)

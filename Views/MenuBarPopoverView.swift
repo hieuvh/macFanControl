@@ -138,8 +138,8 @@ struct MenuBarFanRow: View {
                 Text(fan.name).fontWeight(.bold)
                 Spacer()
                 HStack(spacing: 2) {
-                    Text("")
-                        .animatableNumber(value: animatableSpeed)
+                    Text(verbatim: "\(Int(animatableSpeed))")
+                        .contentTransition(.numericText())
                     Text("RPM")
                 }
                 .font(.caption)
