@@ -55,12 +55,12 @@ struct FanControlRow: View {
                         .foregroundColor(.gray)
                     Spacer()
                     if fan.mode == 0 {
-                        Text("Auto (\(Int(fan.currentSpeed)) RPM)")
+                        Text(verbatim: "Auto (\(Int(fan.currentSpeed)) RPM)")
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
                             .contentTransition(.numericText())
                     } else {
-                        Text("\(Int(sliderVal)) RPM (\(Int(speedPercentage))%)")
+                        Text(verbatim: "\(Int(sliderVal)) RPM (\(Int(speedPercentage))%)")
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
                             .contentTransition(.numericText())

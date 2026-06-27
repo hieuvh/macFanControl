@@ -109,7 +109,7 @@ struct TelemetryCard: View {
                 Text(String(format: "%.0f°C", t))
                     .font(.system(size: 20, weight: .bold))
             } else {
-                Text("--")
+                Text(verbatim: "--")
                     .font(.system(size: 20, weight: .bold))
             }
             Text(label)

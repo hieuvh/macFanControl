@@ -8,7 +8,7 @@ struct AnimatableNumberModifier: AnimatableModifier {
     }
     
     func body(content: Content) -> some View {
-        Text("\(Int(animatableData))")
+        Text(String(Int(animatableData)))
     }
 }
 
