@@ -88,6 +88,12 @@ struct MenuBarPopoverView: View {
             .padding(.bottom, 15)
         }
         .frame(width: 320)
+        .onAppear {
+            viewModel.isMenuBarPopoverVisible = true
+        }
+        .onDisappear {
+            viewModel.isMenuBarPopoverVisible = false
+        }
     }
     
     private func openMainWindow() {

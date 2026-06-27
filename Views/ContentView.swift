@@ -64,6 +64,12 @@ struct ContentView: View {
         .background(WindowAccessor { window in
             window.delegate = MainWindowDelegate.shared
         })
+        .onAppear {
+            viewModel.isAppWindowVisible = true
+        }
+        .onDisappear {
+            viewModel.isAppWindowVisible = false
+        }
     }
 }
 
