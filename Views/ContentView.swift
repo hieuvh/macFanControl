@@ -62,14 +62,9 @@ struct ContentView: View {
         .frame(minWidth: 600, idealWidth: 800, minHeight: 500, idealHeight: 650)
         .background(Color(red: 0.04, green: 0.04, blue: 0.05))
         .background(WindowAccessor { window in
+            window.identifier = NSUserInterfaceItemIdentifier("main-window")
             window.delegate = MainWindowDelegate.shared
         })
-        .onAppear {
-            viewModel.isAppWindowVisible = true
-        }
-        .onDisappear {
-            viewModel.isAppWindowVisible = false
-        }
     }
 }
 
@@ -119,9 +114,4 @@ struct WindowAccessor: NSViewRepresentable {
 
 class MainWindowDelegate: NSObject, NSWindowDelegate {
     static let shared = MainWindowDelegate()
-    func windowShouldClose(_ sender: NSWindow) -> Bool {
-        sender.orderOut(nil)
-        NSApplication.shared.setActivationPolicy(.accessory)
-        return false
-    }
 }
