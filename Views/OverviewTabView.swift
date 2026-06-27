@@ -5,7 +5,7 @@ struct OverviewTabView: View {
     @State private var selectedChart: TriggerRule.SensorType?
     
     let fanColumns = [GridItem(.adaptive(minimum: 300), spacing: 24)]
-    let sensorColumns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
+    let sensorColumns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
     
     var body: some View {
         ScrollView {

@@ -17,16 +17,13 @@ struct FanControlApp: App {
         }
         .windowStyle(HiddenTitleBarWindowStyle())
         
-        
         MenuBarExtra {
             MenuBarPopoverView(viewModel: viewModel)
         } label: {
             if let firstFan = viewModel.fans.first {
                 createMenuIcon(speed: firstFan.currentSpeed)
-                Text("\(firstFan.currentSpeed) RPM")
             } else {
                 Image(systemName: "fan.fill")
-                Text("--")
             }
         }
         .menuBarExtraStyle(.window)
@@ -37,20 +34,20 @@ struct FanControlApp: App {
         let view = HStack(spacing: 4) {
             Image(systemName: "fan.fill")
                 .font(.system(size: 14))
-                .foregroundColor(.primary)
+                .foregroundColor(.white)
             
             HStack(spacing: 2) {
                 RoundedRectangle(cornerRadius: 1)
                     .fill(speed > 0 ? Color.white : Color.gray.opacity(0.3))
-                    .frame(width: 3, height: 14)
+                    .frame(width: 3, height: 12)
                 
                 RoundedRectangle(cornerRadius: 1)
                     .fill(speed >= 3000 ? Color.yellow : Color.gray.opacity(0.3))
-                    .frame(width: 3, height: 14)
+                    .frame(width: 3, height: 12)
                 
                 RoundedRectangle(cornerRadius: 1)
                     .fill(speed >= 5000 ? Color.red : Color.gray.opacity(0.3))
-                    .frame(width: 3, height: 14)
+                    .frame(width: 3, height: 12)
             }
         }
         
