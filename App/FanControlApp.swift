@@ -1,9 +1,19 @@
 import SwiftUI
 import AppKit
 
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Close the default blank window created by SwiftUI at launch
+        for window in NSApplication.shared.windows {
+            window.close()
+        }
+    }
+}
+
 @main
 struct FanControlApp: App {
     @StateObject private var viewModel = FanViewModel()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init() {
         // Keep the app menu-bar-only (no dock icon, no app switcher)

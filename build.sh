@@ -129,6 +129,8 @@ cat <<EOF > "$CONTENTS_DIR/Info.plist"
     <string>$MACOS_DEPLOYMENT_TARGET</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon.icns</string>
+    <key>LSUIElement</key>
+    <true/>
 </dict>
 </plist>
 EOF
