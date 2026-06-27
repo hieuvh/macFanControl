@@ -29,19 +29,19 @@ struct SettingsTabView: View {
                                 .font(.system(size: 12, weight: .medium))
                                 .padding(.vertical, 10)
                                 .padding(.horizontal, 16)
-                                .background(Color.orange)
-                                .foregroundColor(.black)
+                                .background(Color.white.opacity(0.1))
+                                .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.orange.opacity(0.1))
+                    .background(Color.white.opacity(0.03))
                     .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
                     )
                 }
                 
