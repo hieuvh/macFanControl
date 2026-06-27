@@ -32,8 +32,8 @@ struct TempHistoryChartView: View {
     
     var sensorName: String {
         switch sensor {
-        case .cpu: return "CPU Die"
-        case .gpu: return "GPU proximity"
+        case .cpu: return "CPU"
+        case .gpu: return "GPU"
         case .battery: return "Battery"
         }
     }
@@ -74,8 +74,8 @@ struct TempHistoryChartView: View {
                     Image(systemName: sensorIconName)
                         .foregroundColor(sensorColor)
                         .font(.system(size: 14, weight: .bold))
-                    Text("\(sensorName) Temperature History")
-                        .font(.system(size: 13, weight: .bold))
+                    Text("\(sensorName) temperature history")
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.white)
                 }
                 
@@ -97,7 +97,7 @@ struct TempHistoryChartView: View {
                     Image(systemName: "chart.xyaxis.line")
                         .font(.system(size: 24))
                         .foregroundColor(.gray.opacity(0.5))
-                    Text("No temperature data recorded yet.")
+                    Text("No temperature data recorded.")
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
                 }
@@ -108,9 +108,9 @@ struct TempHistoryChartView: View {
             } else {
                 // Statistics Row
                 HStack(spacing: 24) {
-                    StatItem(title: "CURRENT", value: String(format: "%.1f°C", points.last?.value ?? 0), color: sensorColor)
-                    StatItem(title: "AVERAGE", value: String(format: "%.1f°C", statsAvg), color: .white.opacity(0.8))
-                    StatItem(title: "MIN / MAX", value: String(format: "%.1f°C / %.1f°C", statsMin, statsMax), color: .white.opacity(0.8))
+                    StatItem(title: "current", value: String(format: "%.1f°C", points.last?.value ?? 0), color: sensorColor)
+                    StatItem(title: "average", value: String(format: "%.1f°C", statsAvg), color: .white.opacity(0.8))
+                    StatItem(title: "min / max", value: String(format: "%.1f°C / %.1f°C", statsMin, statsMax), color: .white.opacity(0.8))
                     
                     Spacer()
                     
@@ -243,10 +243,10 @@ struct StatItem: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
-                .font(.system(size: 8, weight: .bold))
+                .font(.system(size: 8, weight: .medium))
                 .foregroundColor(.gray)
             Text(value)
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: 11, weight: .medium))
                 .foregroundColor(color)
         }
     }

@@ -9,7 +9,7 @@ struct MenuBarPopoverView: View {
             HStack(spacing: 10) {
                 TelemetryCard(temp: viewModel.cpuTemp, label: "CPU")
                 TelemetryCard(temp: viewModel.gpuTemp, label: "GPU")
-                TelemetryCard(temp: viewModel.batteryTemp, label: "BATTERY")
+                TelemetryCard(temp: viewModel.batteryTemp, label: "Battery")
             }
             .padding(.horizontal)
             .padding(.top, 15)
@@ -35,7 +35,7 @@ struct MenuBarPopoverView: View {
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
-                .help("Open Fan Control Center")
+                .help("Open fan control center")
                 
                 // Sync All Fans
                 Button(action: { 
@@ -45,12 +45,12 @@ struct MenuBarPopoverView: View {
                         Image(systemName: "link")
                             .font(.system(size: 14))
                             .foregroundColor(viewModel.linkedFans ? .teal : .primary)
-                        Text(viewModel.linkedFans ? "Linked" : "Link Fans").font(.system(size: 8))
+                        Text(viewModel.linkedFans ? "Linked" : "Link fans").font(.system(size: 8))
                             .foregroundColor(viewModel.linkedFans ? .teal : .primary)
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
-                .help(viewModel.linkedFans ? "Unlink Fans" : "Sync All Fans Together")
+                .help(viewModel.linkedFans ? "Unlink fans" : "Link all fans")
                 
                 // Reset to Auto
                 Button(action: { viewModel.resetAll() }) {
@@ -61,7 +61,7 @@ struct MenuBarPopoverView: View {
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
-                .help("Reset All to Auto")
+                .help("Reset to auto")
                 
                 // Settings
                 // Button(action: { NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) }) {
@@ -107,13 +107,13 @@ struct TelemetryCard: View {
         VStack {
             if let t = temp {
                 Text(String(format: "%.0f°C", t))
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.system(size: 18, weight: .medium))
             } else {
                 Text(verbatim: "--")
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.system(size: 18, weight: .medium))
             }
             Text(label)
-                .font(.system(size: 10))
+                .font(.system(size: 10, weight: .medium))
                 .opacity(0.7)
         }
         .frame(maxWidth: .infinity)
@@ -135,7 +135,7 @@ struct MenuBarFanRow: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed), size: 24)
-                Text(fan.name).fontWeight(.bold)
+                Text(fan.name).fontWeight(.medium)
                 Spacer()
                 HStack(spacing: 2) {
                     Text(verbatim: "\(Int(animatableSpeed))")
@@ -196,7 +196,7 @@ struct MenuBarFanRow: View {
             }
         }) {
             Text(title)
-                .font(.system(size: 10, weight: .bold))
+                .font(.system(size: 9, weight: .medium))
                 .foregroundColor(isActive ? .teal : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
