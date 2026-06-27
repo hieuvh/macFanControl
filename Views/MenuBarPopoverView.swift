@@ -145,7 +145,7 @@ struct MenuBarFanRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed), size: 24)
+                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed), size: 24, isActive: viewModel.isMenuBarPopoverVisible)
                 Text(fan.name).fontWeight(.medium)
                 Spacer()
                 HStack(spacing: 2) {

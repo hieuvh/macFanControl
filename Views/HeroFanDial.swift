@@ -25,7 +25,7 @@ struct HeroFanDial: View {
                     .stroke(Color.white.opacity(0.1), lineWidth: 10)
                     .frame(width: 150, height: 150)
                 
-                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed))
+                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed), isActive: viewModel.isAppWindowVisible)
             }
             .padding(.vertical, 10)
             
