@@ -6,14 +6,16 @@ struct FanControlApp: App {
     @StateObject private var viewModel = FanViewModel()
     
     init() {
-        // Force the app to act as a normal foreground application with dock icon
-        NSApplication.shared.setActivationPolicy(.regular)
+        // Keep the app menu-bar-only (no dock icon, no app switcher)
+        NSApplication.shared.setActivationPolicy(.accessory)
     }
     
     var body: some Scene {
-        WindowGroup {
-            ContentView(viewModel: viewModel)
-                .preferredColorScheme(.dark)
+        WindowGroup(id: "main-window") {
+            if viewModel.isAppWindowVisible {
+                ContentView(viewModel: viewModel)
+                    .preferredColorScheme(.dark)
+            }
         }
         .windowStyle(HiddenTitleBarWindowStyle())
         
