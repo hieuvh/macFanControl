@@ -7,7 +7,7 @@ struct SettingsTabView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 Text("Settings")
-                    .font(.system(size: 28, weight: .black))
+                    .font(.system(size: 20, weight: .semibold))
                 
                 if !viewModel.isAuthorized {
                     // Privilege setup card
@@ -16,17 +16,17 @@ struct SettingsTabView: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.orange)
                                 .font(.system(size: 20))
-                            Text("Helper Authentication Required")
-                                .font(.system(size: 16, weight: .bold))
+                            Text("Authorization required")
+                                .font(.system(size: 14, weight: .semibold))
                         }
                         
-                        Text("You need to authorize Fan Control to adjust fan speeds and read precise hardware sensors.")
-                            .font(.system(size: 13))
+                        Text("Authorize to manage fan speeds and read hardware sensors.")
+                            .font(.system(size: 12))
                             .foregroundColor(.gray)
                         
                         Button(action: { viewModel.authorize() }) {
-                            Text("Authorize & Enable Fan Adjustments")
-                                .font(.system(size: 13, weight: .bold))
+                            Text("Authorize")
+                                .font(.system(size: 12, weight: .medium))
                                 .padding(.vertical, 10)
                                 .padding(.horizontal, 16)
                                 .background(Color.orange)
@@ -47,15 +47,15 @@ struct SettingsTabView: View {
                 
                 // Global Controls
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Global Controls")
-                        .font(.system(size: 16, weight: .bold))
+                    Text("Global controls")
+                        .font(.system(size: 13, weight: .semibold))
                         
-                    Toggle("Sync All Fans Together", isOn: $viewModel.linkedFans)
+                    Toggle("Link fans", isOn: $viewModel.linkedFans)
                         .toggleStyle(SwitchToggleStyle(tint: .teal))
                     
                     Button(action: { viewModel.resetAll() }) {
-                        Text("Reset All to Auto")
-                            .font(.system(size: 13, weight: .bold))
+                        Text("Reset to auto")
+                            .font(.system(size: 12, weight: .medium))
                             .padding(.vertical, 8)
                             .padding(.horizontal, 16)
                             .background(Color.white.opacity(0.1))
