@@ -40,7 +40,6 @@ struct HeroFanDial: View {
                     Text(verbatim: "\(Int(sliderVal)) RPM")
                         .font(.system(size: 12, weight: .bold, design: .monospaced))
                         .foregroundColor(.teal)
-                        .contentTransition(.numericText())
                 }
                 
                 // Slider
