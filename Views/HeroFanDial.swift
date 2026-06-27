@@ -19,37 +19,32 @@ struct HeroFanDial: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // Title and Spinning Fan Icon
-            HStack {
-                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed))
-                Text(fan.name)
-                    .font(.system(size: 18, weight: .black))
-                Spacer()
-            }
-            .padding(.horizontal, 20)
+            
             
             // Hero Circular Dial
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.1), lineWidth: 10)
-                    .frame(width: 150, height: 150)
+            // ZStack {
+                // Circle()
+                //     .stroke(Color.white.opacity(0.1), lineWidth: 10)
+                //     .frame(width: 150, height: 150)
                 
-                Circle()
-                    .trim(from: 0, to: CGFloat(animatableSpeed) / CGFloat(fan.maxSpeed > 0 ? fan.maxSpeed : 6000))
-                    .stroke(rpmColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                    .frame(width: 150, height: 150)
-                    .rotationEffect(.degrees(-90))
+                // Circle()
+                //     .trim(from: 0, to: CGFloat(animatableSpeed) / CGFloat(fan.maxSpeed > 0 ? fan.maxSpeed : 6000))
+                //     .stroke(rpmColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                //     .frame(width: 150, height: 150)
+                //     .rotationEffect(.degrees(-90))
+
+                SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed))
                 
-                VStack(spacing: 4) {
-                    Text("")
-                        .animatableNumber(value: animatableSpeed)
-                        .font(.system(size: 32, weight: .black, design: .monospaced))
-                    Text("RPM")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.gray)
-                }
-            }
-            .padding(.vertical, 10)
+                // VStack(spacing: 4) {
+                //     Text("")
+                //         .animatableNumber(value: animatableSpeed)
+                //         .font(.system(size: 32, weight: .black, design: .monospaced))
+                //     Text("RPM")
+                //         .font(.system(size: 14, weight: .bold))
+                //         .foregroundColor(.gray)
+                // }
+            // }
+            // .padding(.vertical, 10)
             
             // Speed Controls
             VStack(spacing: 12) {
@@ -61,11 +56,13 @@ struct HeroFanDial: View {
                     Spacer()
                     if fan.mode == 0 {
                         Text(verbatim: "Auto (\(Int(animatableSpeed)) RPM)")
+                        // .animatableNumber(value: animatableSpeed)
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
                             .contentTransition(.numericText())
                     } else {
                         Text(verbatim: "\(Int(sliderVal)) RPM (\(Int(speedPercentage))%)")
+                        // .animatableNumber(value: sliderVal)
                             .font(.system(size: 12, weight: .bold, design: .monospaced))
                             .foregroundColor(.teal)
                             .contentTransition(.numericText())
@@ -76,7 +73,7 @@ struct HeroFanDial: View {
                 Slider(
                     value: $sliderVal,
                     in: Double(fan.minSpeed)...Double(fan.maxSpeed),
-                    step: 50.0,
+                    // step: 50.0,
                     onEditingChanged: { editing in
                         isEditingSlider = editing
                         if editing {
@@ -100,7 +97,15 @@ struct HeroFanDial: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+
+            // Title and Spinning Fan Icon
+            HStack {
+                // SpinningFanView(currentSpeed: animatableSpeed, maxSpeed: Double(fan.maxSpeed))
+                Text(fan.name)
+                    .font(.system(size: 18, weight: .black))
+                // Spacer()
+            }
+            .padding(.vertical, 20)
         }
         .padding(.top, 20)
         .background(Color.white.opacity(0.05))
@@ -116,11 +121,11 @@ struct HeroFanDial: View {
             }
         }
         // Smoothly interpolate the visual RPM number towards the newest hardware snapshot
-        .onChange(of: fan.currentSpeed) { newSpeed in
-            withAnimation(.linear(duration: 1.5)) {
-                animatableSpeed = Double(newSpeed)
-            }
-        }
+        // .onChange(of: fan.currentSpeed) { newSpeed in
+        //     withAnimation(.linear(duration: 1.5)) {
+        //         animatableSpeed = Double(newSpeed)
+        //     }
+        // }
         // Publish slider changes while dragging
         .onChange(of: sliderVal) { newValue in
             if isEditingSlider {

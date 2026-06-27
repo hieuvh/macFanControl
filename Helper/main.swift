@@ -45,7 +45,14 @@ func getStatus() {
     var fansList: [FanJSON] = []
     
     for i in 0..<fanCount {
-        let name = smc.getStringValue("F\(i)ID") ?? "Fan \(i)"
+        let name: String
+        if i == 0 {
+            name = fanCount == 1 ? "Fan" : "Left"
+        } else if i == 1 {
+            name = "Right"
+        } else {
+            name = "Fan \(i + 1)"
+        }
         let current = Int(smc.getValue("F\(i)Ac") ?? 0)
         let minS = Int(smc.getValue("F\(i)Mn") ?? 0)
         let maxS = Int(smc.getValue("F\(i)Mx") ?? 0)
