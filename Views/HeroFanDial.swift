@@ -73,7 +73,6 @@ struct HeroFanDial: View {
                 Slider(
                     value: $sliderVal,
                     in: Double(fan.minSpeed)...Double(fan.maxSpeed),
-                    // step: 50.0,
                     onEditingChanged: { editing in
                         isEditingSlider = editing
                         if editing {

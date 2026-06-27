@@ -11,13 +11,13 @@ let bgRect = CGRect(origin: .zero, size: size)
 // For macOS icons, a slight corner radius is standard, but the OS masks the .icns anyway.
 // We'll draw a solid rounded rect just in case.
 let bgPath = NSBezierPath(roundedRect: bgRect, xRadius: 225, yRadius: 225)
-NSColor(red: 0.04, green: 0.04, blue: 0.05, alpha: 1.0).setFill()
+NSColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1.0).setFill()
 bgPath.fill()
 
 // 2. Prepare the SF Symbol
 let config = NSImage.SymbolConfiguration(pointSize: 600, weight: .semibold)
 // Modern palette: Vibrant Cyan and Indigo
-let colorConfig = NSImage.SymbolConfiguration(paletteColors: [NSColor.systemCyan, NSColor.systemIndigo])
+let colorConfig = NSImage.SymbolConfiguration(paletteColors: [NSColor.white, NSColor.white])
 let finalConfig = config.applying(colorConfig)
 
 if let symbol = NSImage(systemSymbolName: "fan.fill", accessibilityDescription: nil)?.withSymbolConfiguration(finalConfig) {
