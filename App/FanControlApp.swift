@@ -33,22 +33,23 @@ struct FanControlApp: App {
     private func createMenuIcon(speed: Int) -> Image {
         let view = HStack(spacing: 4) {
             Image(systemName: "fan.fill")
-                .font(.system(size: 14))
+                .font(.system(size: 16))
                 .foregroundColor(.white)
             
             VStack(spacing: 2) {
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(speed >= 5500 ? Color.red : Color.gray.opacity(0.4))
-                    .frame(width: 4, height: 3)
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(speed >= 5500 ? Color.red : Color.gray.opacity(0.2))
+                    .frame(width: 4, height: 4)
                 
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(speed >= 3500 ? Color.yellow : Color.gray.opacity(0.4))
-                    .frame(width: 4, height: 3)
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(speed >= 3500 ? Color.yellow : Color.gray.opacity(0.2))
+                    .frame(width: 4, height: 4)
 
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(speed > 0 ? Color.white : Color.gray.opacity(0.4))
-                    .frame(width: 4, height: 3)
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(speed > 0 ? Color.white : Color.gray.opacity(0.2))
+                    .frame(width: 4, height: 4)
             }
+            .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 1)
         }
         
         let renderer = ImageRenderer(content: view)
