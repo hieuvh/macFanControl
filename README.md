@@ -41,8 +41,6 @@ It features a dual-component design: a sandboxed SwiftUI GUI front-end that comm
     *   **O(N) Traversal**: Computes statistical summaries in a single pass to eliminate chart hover latency.
     *   **SMC Caching**: Detects and caches active SMC sensor keys once on startup.
 
-![Optimized Memory Profile (Window Closed: ~1.2MB overhead)](memory_usage.png)
-
 ---
 
 ## 📂 Project Architecture & Code Structure
