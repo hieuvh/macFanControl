@@ -1,4 +1,4 @@
-# macOS Fan Control Utility
+# macFanControl
 
 A sleek, native SwiftUI macOS application designed for real-time monitoring and manual/automated control of MacBook fan speeds. Compatible exclusively with Apple Silicon (M1/M2/M3/M4/M5+) architectures (Intel processors are not supported).
 
@@ -78,7 +78,7 @@ chmod +x build.sh
 ./build.sh
 ```
 
-This compiles `smc-helper` and `FanControl`, drafts the app metadata (`Info.plist`), and processes visual assets to output a standard application bundle: **`Fan Control.app`** and a compressed **`Fan Control.zip`** ready for distribution.
+This compiles `smc-helper` and `macFanControl`, drafts the app metadata (`Info.plist`), and processes visual assets to output a standard application bundle: **`macFanControl.app`** and a compressed **`macFanControl.zip`** ready for distribution.
 
 By default, the build script pins the app and helper binaries to macOS 13.0 and compiles for Apple Silicon (arm64) architectures. You can override those defaults:
 
@@ -94,7 +94,7 @@ MACOS_DEPLOYMENT_TARGET=14.0 ARCHS="arm64" ./build.sh
     Open the application bundle in Finder or launch it from your terminal:
 
     ```bash
-    open "Fan Control.app"
+    open "macFanControl.app"
     ```
 
 2.  **Configure Privilege Setup (Required Once)**:
@@ -105,8 +105,8 @@ MACOS_DEPLOYMENT_TARGET=14.0 ARCHS="arm64" ./build.sh
     *Alternatively, you can manually set the privileged helper permissions using the command line:*
 
     ```bash
-    sudo chown root:wheel "Fan Control.app/Contents/MacOS/smc-helper"
-    sudo chmod +s "Fan Control.app/Contents/MacOS/smc-helper"
+    sudo chown root:wheel "macFanControl.app/Contents/MacOS/smc-helper"
+    sudo chmod +s "macFanControl.app/Contents/MacOS/smc-helper"
     ```
 
 ---
