@@ -69,15 +69,18 @@ struct MenuBarPopoverView: View {
                 .help("Reset to auto")
                 
                 // Settings
-                // Button(action: { NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) }) {
-                //     VStack {
-                //         Image(systemName: "gearshape")
-                //             .font(.system(size: 14))
-                //         Text("Settings").font(.system(size: 8))
-                //     }
-                // }
-                // .buttonStyle(PlainButtonStyle())
-                // .help("Open Settings")
+                Button(action: {
+                    viewModel.selectedTab = .settings
+                    openMainWindow()
+                }) {
+                    VStack {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 14))
+                        Text("Settings").font(.system(size: 8))
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .help("Open settings panel")
                 
                 // Quit
                 Button(action: { NSApplication.shared.terminate(nil) }) {
