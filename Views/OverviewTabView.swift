@@ -48,16 +48,13 @@ struct OverviewTabView: View {
                 
                 // Hero Fans Section
                 if !viewModel.fans.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHGrid(rows: [GridItem(.flexible())], spacing: 24) {
-                            ForEach(viewModel.fans) { fan in
-                                HeroFanDial(fan: fan, viewModel: viewModel)
-                                    .frame(minWidth: 320, maxWidth: 450)
-                            }
+                    HStack(spacing: 24) {
+                        ForEach(viewModel.fans) { fan in
+                            HeroFanDial(fan: fan, viewModel: viewModel)
+                                .frame(maxWidth: 400)
                         }
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 8)
                     }
+                    .padding(.vertical, 8)
                 }
                 
                 // Sensors Section
