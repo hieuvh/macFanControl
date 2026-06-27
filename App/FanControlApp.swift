@@ -1,91 +1,107 @@
 import SwiftUI
 import AppKit
 
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Close only the default blank window created by SwiftUI at launch, preserving MenuBarExtra windows
+        for window in NSApplication.shared.windows {
+            let isTitled = window.styleMask.contains(.titled)
+            print("Detected window: \(window), title: '\(window.title)', styleMask: \(window.styleMask.rawValue), isTitled: \(isTitled)")
+            if isTitled {
+                print("Closing main window group window: \(window)")
+                window.close()
+            }
+        }
+    }
+    
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
+    }
+}
+
 @main
 struct FanControlApp: App {
     @StateObject private var viewModel = FanViewModel()
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init() {
-        // Force the app to act as a normal foreground application with dock icon
-        NSApplication.shared.setActivationPolicy(.regular)
+        // Keep the app menu-bar-only (no dock icon, no app switcher)
+        NSApplication.shared.setActivationPolicy(.accessory)
     }
     
     var body: some Scene {
-        WindowGroup {
-            ContentView(viewModel: viewModel)
-                .preferredColorScheme(.dark)
+        WindowGroup(id: "main-window") {
+            if viewModel.isAppWindowVisible {
+                ContentView(viewModel: viewModel)
+                    .preferredColorScheme(.dark)
+            }
         }
         .windowStyle(HiddenTitleBarWindowStyle())
         
         MenuBarExtra {
-            Group {
-                ForEach(viewModel.fans) { fan in
-                    Button("\(fan.name): \(fan.currentSpeed) RPM (\(fan.mode == 1 ? "Manual" : "Auto"))") {
-                        openMainWindow()
-                    }
-                }
-                
-                if let battery = viewModel.batteryTemp {
-                    Button(String(format: "Battery Temp: %.1f°C", battery)) {
-                        openMainWindow()
-                    }
-                }
-                
-                Divider()
-                
-                Button("Open Fan Control Center...") {
-                    openMainWindow()
-                }
-                
-                Button("Reset All to Auto") {
-                    viewModel.resetAll()
-                }
-                
-                Divider()
-                
-                Button("Manual: 20% Speed") {
-                    viewModel.setAllToPercentage(0.20)
-                }
-                
-                Button("Manual: 40% Speed") {
-                    viewModel.setAllToPercentage(0.40)
-                }
-                
-                Button("Manual: 50% Speed") {
-                    viewModel.setAllToPercentage(0.50)
-                }
-                
-                Button("Manual: 80% Speed") {
-                    viewModel.setAllToPercentage(0.80)
-                }
-                
-                Button("Manual: MAX Speed") {
-                    viewModel.setAllToPercentage(1.00)
-                }
-                
-                Divider()
-                
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
-                }
-            }
+            MenuBarPopoverView(viewModel: viewModel)
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "wind")
-                if let firstFan = viewModel.fans.first {
-                    Text("\(firstFan.currentSpeed) RPM")
-                } else {
-                    Text("Fan Control")
-                }
+            if !viewModel.fans.isEmpty {
+                let maxSpeed = viewModel.fans.map { $0.currentSpeed }.max() ?? 0
+                createMenuIcon(speed: maxSpeed)
+            } else {
+                Image(systemName: "fan.fill")
             }
         }
+        .menuBarExtraStyle(.window)
     }
     
-    private func openMainWindow() {
-        NSApplication.shared.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
-        if let window = NSApplication.shared.windows.first {
-            window.makeKeyAndOrderFront(nil)
+    struct MenuIconCache {
+        @MainActor static var cache: [Int: Image] = [:]
+    }
+    
+    @MainActor
+    private func createMenuIcon(speed: Int) -> Image {
+        let state: Int
+        if speed >= 5500 {
+            state = 3
+        } else if speed >= 3500 {
+            state = 2
+        } else if speed > 0 {
+            state = 1
+        } else {
+            state = 0
         }
+        
+        if let cached = MenuIconCache.cache[state] {
+            return cached
+        }
+        
+        let view = HStack(spacing: 2) {
+            Image(systemName: "fan.fill")
+                .font(.system(size: 14))
+                .foregroundColor(.white)
+            
+            VStack(spacing: 2) {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(state >= 3 ? Color.red : Color.gray.opacity(0.2))
+                    .frame(width: 4, height: 4)
+                
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(state >= 2 ? Color.yellow : Color.gray.opacity(0.2))
+                    .frame(width: 4, height: 4)
+
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(state >= 1 ? Color.green : Color.gray.opacity(0.2))
+                    .frame(width: 4, height: 4)
+            }
+            .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 1)
+        }
+        
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 2.0
+        
+        if let nsImage = renderer.nsImage {
+            let img = Image(nsImage: nsImage)
+            MenuIconCache.cache[state] = img
+            return img
+        }
+        
+        return Image(systemName: "fan.fill")
     }
 }

@@ -1,14 +1,14 @@
 import Foundation
 
 // MARK: - Models for JSON Parsing
-struct FanJSON: Codable, Identifiable {
+struct FanJSON: Codable, Identifiable, Equatable {
     let id: Int
     let name: String
-    let currentSpeed: Int
+    var currentSpeed: Int
     let minSpeed: Int
     let maxSpeed: Int
-    let targetSpeed: Int
-    let mode: Int
+    var targetSpeed: Int
+    var mode: FanMode
 }
 
 struct SystemStatusJSON: Codable {
@@ -84,3 +84,26 @@ struct TriggerRule: Identifiable, Codable, Hashable {
         maxSpeedPercent = try container.decodeIfPresent(Double.self, forKey: .maxSpeedPercent) ?? 100.0
     }
 }
+
+struct FanSnapshot: Codable, Equatable {
+    var fans: [FanJSON]
+    let cpuTemp: Double?
+    let gpuTemp: Double?
+    let batteryTemp: Double?
+    let timestamp: Date
+
+    init(
+        fans: [FanJSON],
+        cpuTemp: Double?,
+        gpuTemp: Double?,
+        batteryTemp: Double?,
+        timestamp: Date = Date()
+    ) {
+        self.fans = fans
+        self.cpuTemp = cpuTemp
+        self.gpuTemp = gpuTemp
+        self.batteryTemp = batteryTemp
+        self.timestamp = timestamp
+    }
+}
+

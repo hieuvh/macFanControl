@@ -1,0 +1,76 @@
+<h2>Which Menu Bar layout do you prefer?</h2>
+<p class="subtitle">This determines how the controls will look when you click the menu bar icon.</p>
+
+<div class="options">
+  <div class="option" data-choice="compact" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Compact Control Center Style</h3>
+      <p>A minimalist vertical list fitting standard macOS design.</p>
+      <div class="mockup-body" style="padding: 10px; border: 1px solid #333; margin-top: 10px; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>CPU Temp</span><span>75°C</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>GPU Temp</span><span>60°C</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+          <span>Battery</span><span>35°C</span>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #333; margin-bottom: 15px;" />
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Left Fan</span><span>Auto · 2000 RPM</span>
+          </div>
+          <input type="range" class="mock-input" style="width: 100%; margin-top: 5px;">
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Right Fan</span><span>Auto · 2100 RPM</span>
+          </div>
+          <input type="range" class="mock-input" style="width: 100%; margin-top: 5px;">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="option" data-choice="detailed" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Detailed Mini-Dashboard</h3>
+      <p>A wider popover that shows rich graphical gauges like the main app.</p>
+      <div class="mockup-body" style="padding: 10px; border: 1px solid #333; margin-top: 10px; border-radius: 8px; display: flex; flex-direction: column;">
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+          <div style="flex: 1; text-align: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+            <div style="font-size: 20px; font-weight: bold;">75°C</div>
+            <div style="font-size: 10px; opacity: 0.7;">CPU</div>
+          </div>
+          <div style="flex: 1; text-align: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+            <div style="font-size: 20px; font-weight: bold;">60°C</div>
+            <div style="font-size: 10px; opacity: 0.7;">GPU</div>
+          </div>
+          <div style="flex: 1; text-align: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+            <div style="font-size: 20px; font-weight: bold;">35°C</div>
+            <div style="font-size: 10px; opacity: 0.7;">BATT</div>
+          </div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong>Left Fan</strong>
+            <button class="mock-button" style="padding: 2px 8px; font-size: 10px;">Auto</button>
+          </div>
+          <input type="range" class="mock-input" style="width: 100%;">
+          <div style="text-align: right; font-size: 12px; margin-top: 5px;">2000 RPM</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong>Right Fan</strong>
+            <button class="mock-button" style="padding: 2px 8px; font-size: 10px;">Manual</button>
+          </div>
+          <input type="range" class="mock-input" style="width: 100%;">
+          <div style="text-align: right; font-size: 12px; margin-top: 5px;">4500 RPM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10,12 +10,12 @@ struct RulesEngineView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Image(systemName: "slider.horizontal.3")
-                            .foregroundColor(.purple)
-                        Text("Auto-Trigger Rules Engine")
-                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.teal)
+                        Text("Rules engine")
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.white)
                     }
-                    Text("Automatically override fan speeds when sensors cross temperature thresholds.")
+                    Text("Override fan speeds based on temperature thresholds.")
                         .font(.system(size: 11))
                         .foregroundColor(.gray)
                 }
@@ -23,7 +23,7 @@ struct RulesEngineView: View {
                 Spacer()
                 
                 Toggle("", isOn: $viewModel.isRulesEngineEnabled)
-                    .toggleStyle(SwitchToggleStyle(tint: .purple))
+                    .toggleStyle(SwitchToggleStyle(tint: .teal))
             }
             
             if viewModel.isRulesEngineEnabled {
@@ -43,13 +43,13 @@ struct RulesEngineView: View {
                     }) {
                         HStack {
                             Image(systemName: "plus.circle.fill")
-                            Text("Add Custom Trigger Rule")
+                            Text("Add rule")
                         }
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.purple)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.teal)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
-                        .background(Color.purple.opacity(0.1))
+                        .background(Color.teal.opacity(0.1))
                         .cornerRadius(8)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -62,7 +62,7 @@ struct RulesEngineView: View {
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(viewModel.isRulesEngineEnabled ? Color.purple.opacity(0.2) : Color.white.opacity(0.04), lineWidth: 1)
+                .stroke(viewModel.isRulesEngineEnabled ? Color.teal.opacity(0.2) : Color.white.opacity(0.04), lineWidth: 1)
         )
         .padding(.horizontal, 24)
     }
@@ -77,11 +77,11 @@ struct RuleRowView: View {
             // Header Row: Toggle, Sensor, Rule Type, Trash
             HStack(spacing: 12) {
                 Toggle("", isOn: $rule.isEnabled)
-                    .toggleStyle(SwitchToggleStyle(tint: .green))
+                    .toggleStyle(SwitchToggleStyle(tint: .teal))
                     .labelsHidden()
                 
-                Text("If")
-                    .font(.system(size: 13))
+                Text("if")
+                    .font(.system(size: 12))
                     .foregroundColor(.gray)
                 
                 Picker("", selection: $rule.sensor) {
@@ -120,45 +120,45 @@ struct RuleRowView: View {
                 VStack(spacing: 8) {
                     HStack(spacing: 12) {
                         Spacer().frame(width: 48)
-                        Text("If temp ≥")
-                            .font(.system(size: 13))
+                        Text("if temp ≥")
+                            .font(.system(size: 12))
                             .foregroundColor(.gray)
                         
                         Text("\(Int(rule.thresholdTemp))°C")
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.white)
                             .frame(width: 36)
                         
                         Slider(value: $rule.thresholdTemp, in: 30...95, step: 1)
-                            .accentColor(.purple)
+                            .accentColor(.teal)
                     }
                     
                     HStack(spacing: 12) {
                         Spacer().frame(width: 48)
-                        Text("Set speed to")
-                            .font(.system(size: 13))
+                        Text("set speed to")
+                            .font(.system(size: 12))
                             .foregroundColor(.gray)
                         
                         Text("\(Int(rule.targetSpeedPercent))%")
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundColor(.white)
                             .frame(width: 36)
                         
                         Slider(value: $rule.targetSpeedPercent, in: 0...100, step: 5)
-                            .accentColor(.purple)
+                            .accentColor(.teal)
                     }
                 }
             } else {
                 VStack(spacing: 8) {
                     HStack(spacing: 12) {
                         Spacer().frame(width: 48)
-                        Text("Temp range:")
-                            .font(.system(size: 13))
+                        Text("temp range:")
+                            .font(.system(size: 12))
                             .foregroundColor(.gray)
                             .frame(width: 80, alignment: .leading)
                         
                         Text("\(Int(rule.minTemp))°C")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.teal)
                             .frame(width: 36)
                         
@@ -166,11 +166,11 @@ struct RuleRowView: View {
                             .accentColor(.teal)
                         
                         Text("to")
-                            .font(.system(size: 12))
+                            .font(.system(size: 11))
                             .foregroundColor(.gray)
                         
                         Text("\(Int(rule.maxTemp))°C")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.red)
                             .frame(width: 36)
                         
@@ -180,13 +180,13 @@ struct RuleRowView: View {
                     
                     HStack(spacing: 12) {
                         Spacer().frame(width: 48)
-                        Text("Speed range:")
-                            .font(.system(size: 13))
+                        Text("speed range:")
+                            .font(.system(size: 12))
                             .foregroundColor(.gray)
                             .frame(width: 80, alignment: .leading)
                         
                         Text("\(Int(rule.minSpeedPercent))%")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.teal)
                             .frame(width: 36)
                         
@@ -194,11 +194,11 @@ struct RuleRowView: View {
                             .accentColor(.teal)
                         
                         Text("to")
-                            .font(.system(size: 12))
+                            .font(.system(size: 11))
                             .foregroundColor(.gray)
                         
                         Text("\(Int(rule.maxSpeedPercent))%")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.red)
                             .frame(width: 36)
                         
