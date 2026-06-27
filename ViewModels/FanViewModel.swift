@@ -18,6 +18,20 @@ class FanViewModel: ObservableObject {
     
     private var isFetchingStatus: Bool = false
     
+    var isAppWindowVisible: Bool = false {
+        didSet {
+            updateTimerFrequency()
+        }
+    }
+    
+    var isMenuBarPopoverVisible: Bool = false {
+        didSet {
+            updateTimerFrequency()
+        }
+    }
+    
+    private var currentInterval: TimeInterval = 1.5
+    
     @Published var rules: [TriggerRule] = [] {
         didSet {
             saveRules()
@@ -26,6 +40,7 @@ class FanViewModel: ObservableObject {
     @Published var isRulesEngineEnabled: Bool = false {
         didSet {
             UserDefaults.standard.set(isRulesEngineEnabled, forKey: "isRulesEngineEnabled")
+            updateTimerFrequency()
             if !isRulesEngineEnabled && wasRuleApplied {
                 resetAll()
                 wasRuleApplied = false
@@ -117,11 +132,27 @@ class FanViewModel: ObservableObject {
     }
     
     func startPolling() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
-            self?.updateStatus()
-        }
+        updateTimerFrequency()
         updateStatus()
+    }
+    
+    private func updateTimerFrequency() {
+        let newInterval: TimeInterval
+        if isAppWindowVisible || isMenuBarPopoverVisible {
+            newInterval = 1.5
+        } else if isRulesEngineEnabled {
+            newInterval = 5.0
+        } else {
+            newInterval = 30.0
+        }
+        
+        if timer == nil || abs(currentInterval - newInterval) > 0.01 {
+            currentInterval = newInterval
+            timer?.invalidate()
+            timer = Timer.scheduledTimer(withTimeInterval: newInterval, repeats: true) { [weak self] _ in
+                self?.updateStatus()
+            }
+        }
     }
     
     func updateStatus() {
