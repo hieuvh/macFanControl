@@ -31,19 +31,26 @@ struct SettingsTabView: View {
                 }
                 
                 // Global Controls
-                VStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Global Controls")
+                        .font(.system(size: 16, weight: .bold))
+                        
                     Toggle("Sync All Fans Together", isOn: $viewModel.linkedFans)
                         .toggleStyle(SwitchToggleStyle(tint: .teal))
                     
                     Button(action: { viewModel.resetAll() }) {
                         Text("Reset All to Auto")
-                            .padding()
+                            .font(.system(size: 13, weight: .bold))
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                             .background(Color.white.opacity(0.1))
+                            .foregroundColor(.white)
                             .cornerRadius(8)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.white.opacity(0.05))
                 .cornerRadius(12)
             }
