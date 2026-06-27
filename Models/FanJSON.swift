@@ -84,3 +84,26 @@ struct TriggerRule: Identifiable, Codable, Hashable {
         maxSpeedPercent = try container.decodeIfPresent(Double.self, forKey: .maxSpeedPercent) ?? 100.0
     }
 }
+
+public struct FanSnapshot: Codable, Equatable {
+    public let fans: [FanJSON]
+    public let cpuTemp: Double?
+    public let gpuTemp: Double?
+    public let batteryTemp: Double?
+    public let timestamp: Date
+
+    public init(
+        fans: [FanJSON],
+        cpuTemp: Double?,
+        gpuTemp: Double?,
+        batteryTemp: Double?,
+        timestamp: Date = Date()
+    ) {
+        self.fans = fans
+        self.cpuTemp = cpuTemp
+        self.gpuTemp = gpuTemp
+        self.batteryTemp = batteryTemp
+        self.timestamp = timestamp
+    }
+}
+
