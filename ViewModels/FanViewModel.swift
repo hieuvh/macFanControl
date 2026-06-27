@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ServiceManagement
 
 // MARK: - View Model
 class FanViewModel: ObservableObject {
@@ -31,6 +32,13 @@ class FanViewModel: ObservableObject {
     }
     
     private var currentInterval: TimeInterval = 1.5
+    
+    @Published var launchAtStartup: Bool = false {
+        didSet {
+            guard launchAtStartup != oldValue else { return }
+            setLaunchAtStartup(enabled: launchAtStartup)
+        }
+    }
     
     @Published var rules: [TriggerRule] = [] {
         didSet {
@@ -65,6 +73,7 @@ class FanViewModel: ObservableObject {
         checkAuthorization()
         loadRules()
         loadHistory()
+        checkLaunchAtStartupStatus()
         startPolling()
     }
     
@@ -460,6 +469,41 @@ class FanViewModel: ObservableObject {
            let decoded = try? JSONDecoder().decode([TempRecord].self, from: data) {
             self.tempHistory = decoded
             self.lastHistoryRecordTime = decoded.last?.timestamp
+        }
+    }
+    
+    private func checkLaunchAtStartupStatus() {
+        if #available(macOS 13.0, *) {
+            let status = SMAppService.mainApp.status
+            self.launchAtStartup = (status == .enabled)
+        }
+    }
+    
+    private func setLaunchAtStartup(enabled: Bool) {
+        if #available(macOS 13.0, *) {
+            let service = SMAppService.mainApp
+            let currentlyEnabled = (service.status == .enabled)
+            guard enabled != currentlyEnabled else { return }
+            
+            if enabled {
+                do {
+                    try service.register()
+                } catch {
+                    print("Failed to register SMAppService: \(error)")
+                    DispatchQueue.main.async {
+                        self.launchAtStartup = false
+                    }
+                }
+            } else {
+                do {
+                    try service.unregister()
+                } catch {
+                    print("Failed to unregister SMAppService: \(error)")
+                    DispatchQueue.main.async {
+                        self.launchAtStartup = true
+                    }
+                }
+            }
         }
     }
     
