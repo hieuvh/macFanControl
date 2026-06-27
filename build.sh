@@ -3,8 +3,8 @@
 # Exit immediately if any command fails.
 set -euo pipefail
 
-APP_NAME="Fan Control"
-APP_EXECUTABLE="FanControl"
+APP_NAME="macFanControl"
+APP_EXECUTABLE="macFanControl"
 HELPER_EXECUTABLE="smc-helper"
 SIGNING_IDENTITY="Apple Development: Hieu Vu (356JW5S467)"
 
@@ -116,7 +116,7 @@ cat <<EOF > "$CONTENTS_DIR/Info.plist"
     <key>CFBundleExecutable</key>
     <string>$APP_EXECUTABLE</string>
     <key>CFBundleIdentifier</key>
-    <string>com.pair.FanControl</string>
+    <string>com.utility.macfancontrol</string>
     <key>CFBundleName</key>
     <string>$APP_NAME</string>
     <key>CFBundlePackageType</key>
@@ -175,15 +175,15 @@ codesign --force --sign "$SIGNING_IDENTITY" --options runtime "$APP_DIR"
 
 # 8. Create DMG disk image
 echo "Packaging to ZIP..."
-rm -f "Fan Control.zip"
+rm -f "macFanControl.zip"
 rm -rf dist
 mkdir -p dist
 cp -R "$APP_DIR" dist/
 cd dist
-zip -ryq "../Fan Control.zip" "Fan Control.app"
+zip -ryq "../macFanControl.zip" "macFanControl.app"
 cd ..
 rm -rf dist
 
 echo "Codesigning ZIP is not strictly required, skipping..."
 
-echo "=== Build and Packaging Complete: 'Fan Control.zip' created successfully ==="
+echo "=== Build and Packaging Complete: 'macFanControl.zip' created successfully ==="
