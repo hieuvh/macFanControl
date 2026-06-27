@@ -43,7 +43,7 @@ struct SettingsTabView: View {
                 // Version Info
                 HStack {
                     Spacer()
-                    Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3.0") (Build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
+                    Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (Build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundColor(.white.opacity(0.4))
                     Spacer()
