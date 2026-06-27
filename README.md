@@ -29,8 +29,13 @@ It features a dual-component design: a sandboxed SwiftUI GUI front-end that comm
     *   Trigger administrative setups, apply manual presets, toggle link configurations, or launch the settings panel directly.
 *   **Launch at Startup**:
     *   Built-in configuration toggle utilizing macOS native `SMAppService` API for login registrations.
-*   **Ultra Performance & Battery Saving**:
-    *   **Dynamic Polling Loop**: Automatic interval adjustments (1.5s active interactive, 5s background active rules checking, 30s background idle).
+*   **Ultra Performance, Memory & Battery Saving**:
+    *   **Lazy Main Window**: Prevents initial `ContentView` instantiation at startup. Automatically deallocates the entire SwiftUI view tree, charts, and layout hierarchies when the main window is closed.
+    *   **Two-Tier Data Model**: Maintains a compact in-memory ring buffer (5–10 values) for the menu bar telemetry while only allocating the full 60+ record history chart in memory when the window is visible.
+    *   **Autoreleasepool Tick Boxing**: Wraps the background SMC reading ticks inside `autoreleasepool {}` to instantly release temporary allocation buffers without waiting for the system run loop.
+    *   **Single Atomic `@Published` Snapshot**: Consolidated multi-property updates into a single `@Published var snapshot: FanSnapshot` to trigger exactly one SwiftUI diff pass instead of N separate updates per tick.
+    *   **OS-level Agent (Dock Isolation)**: Set `LSUIElement` to `true` at the Info.plist level combined with `applicationShouldTerminateAfterLastWindowClosed` returning `false` to start purely in the menu bar without launching any initial blank window.
+    *   **Dynamic Polling Loop**: Automatic interval adjustments (1.5s active interactive, 5.0s background active rules checking).
     *   **Draw Caching**: Pre-renders menu bar status icons to prevent expensive main-thread drawing allocations.
     *   **Timeline Animation Pausing**: Stops fan timelines completely when container windows or popovers are collapsed.
     *   **O(N) Traversal**: Computes statistical summaries in a single pass to eliminate chart hover latency.
@@ -56,7 +61,7 @@ The codebase is organized into clean, single-responsibility files conforming to 
     *   `SettingsTabView.swift`: Startup and link fans toggles.
     *   `SpinningFanView.swift`: Timeline animatable vector fan blade widget.
     *   `TempHistoryChartView.swift`: Single-pass O(N) temperature log graph.
--   📂 **`App/`**: Application Entry Scene (`FanControlApp.swift`) coordinating regular activation and system Menu Bar Extra tray access.
+-   📂 **`App/`**: Application Entry Scene (`FanControlApp.swift`) coordinating background agent lifecycle and system Menu Bar Extra tray access.
 -   📂 **`Helper/`**: Privilege operations wrapper (`main.swift`) serving as a setuid execution client.
 
 ---
