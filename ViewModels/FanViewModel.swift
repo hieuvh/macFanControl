@@ -166,16 +166,17 @@ class FanViewModel: ObservableObject {
         do shell script "chown root:wheel '\(path)' && chmod +s '\(path)'" with administrator privileges
         """
         
-        guard let appleScript = NSAppleScript(source: appleScriptSource) else {
-            self.errorMessage = "Failed to compile authorization script."
-            return
-        }
-        
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let appleScript = NSAppleScript(source: appleScriptSource) else {
+                DispatchQueue.main.async { [weak self] in
+                    self?.errorMessage = "Failed to compile authorization script."
+                }
+                return
+            }
             var error: NSDictionary? = nil
             appleScript.executeAndReturnError(&error)
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 if let err = error {
                     let desc = err[NSAppleScript.errorMessage] as? String ?? "Authorization rejected or failed."
