@@ -143,9 +143,6 @@ struct HeroFanDial: View {
                     viewModel.changeFanMode(fanId: fan.id, mode: .automatic)
                 } else {
                     sliderVal = val
-                    if fan.mode != .forced {
-                        viewModel.changeFanMode(fanId: fan.id, mode: .forced)
-                    }
                     viewModel.changeFanSpeed(fanId: fan.id, speed: Int(val))
                 }
             }
