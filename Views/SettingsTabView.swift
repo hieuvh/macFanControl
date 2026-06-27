@@ -12,13 +12,23 @@ struct SettingsTabView: View {
                 if !viewModel.isAuthorized {
                     // Privilege setup card
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Helper Authentication Required")
-                            .font(.system(size: 16, weight: .bold))
+                        HStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                                .font(.system(size: 20))
+                            Text("Helper Authentication Required")
+                                .font(.system(size: 16, weight: .bold))
+                        }
+                        
+                        Text("You need to authorize Fan Control to adjust fan speeds and read precise hardware sensors.")
+                            .font(.system(size: 13))
+                            .foregroundColor(.gray)
                         
                         Button(action: { viewModel.authorize() }) {
                             Text("Authorize & Enable Fan Adjustments")
                                 .font(.system(size: 13, weight: .bold))
-                                .padding()
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 16)
                                 .background(Color.orange)
                                 .foregroundColor(.black)
                                 .cornerRadius(8)
@@ -26,8 +36,13 @@ struct SettingsTabView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                     .padding()
-                    .background(Color.white.opacity(0.05))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.orange.opacity(0.1))
                     .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                    )
                 }
                 
                 // Global Controls

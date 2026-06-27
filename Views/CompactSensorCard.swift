@@ -13,6 +13,9 @@ struct CompactSensorCard: View {
                     .foregroundColor(color)
                     .font(.system(size: 16, weight: .bold))
                 Spacer()
+                Image(systemName: "chevron.down")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 12, weight: .bold))
             }
             
             VStack(alignment: .leading, spacing: 2) {

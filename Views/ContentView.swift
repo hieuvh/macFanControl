@@ -16,12 +16,9 @@ struct ContentView: View {
             // Sidebar
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Fan Control")
-                        .font(.system(size: 18, weight: .black))
-                        .foregroundColor(.white)
-                    Text("Center v2.0")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundColor(.teal)
+                    Text("fan control")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white.opacity(0.9))
                 }
                 .padding(.bottom, 20)
                 
@@ -29,7 +26,7 @@ struct ContentView: View {
                     selectedTab = .overview
                 }
                 
-                SidebarButton(title: "Rules Engine", icon: "bolt.fill", isSelected: selectedTab == .rules) {
+                SidebarButton(title: "Rules", icon: "bolt.fill", isSelected: selectedTab == .rules) {
                     selectedTab = .rules
                 }
                 
@@ -83,7 +80,7 @@ struct SidebarButton: View {
                     .font(.system(size: 14))
                     .frame(width: 20)
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 13, weight: .medium))
                 Spacer()
             }
             .foregroundColor(isSelected ? .white : .gray)
@@ -95,6 +92,7 @@ struct SidebarButton: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(isSelected ? Color.teal.opacity(0.5) : Color.clear, lineWidth: 1)
             )
+            .contentShape(Rectangle())
         }
         .buttonStyle(PlainButtonStyle())
     }
