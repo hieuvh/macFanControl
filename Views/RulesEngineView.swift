@@ -10,7 +10,7 @@ struct RulesEngineView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Image(systemName: "slider.horizontal.3")
-                            .foregroundColor(.purple)
+                            .foregroundColor(.teal)
                         Text("Rules engine")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.white)
@@ -23,7 +23,7 @@ struct RulesEngineView: View {
                 Spacer()
                 
                 Toggle("", isOn: $viewModel.isRulesEngineEnabled)
-                    .toggleStyle(SwitchToggleStyle(tint: .purple))
+                    .toggleStyle(SwitchToggleStyle(tint: .teal))
             }
             
             if viewModel.isRulesEngineEnabled {
@@ -46,10 +46,10 @@ struct RulesEngineView: View {
                             Text("Add rule")
                         }
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.purple)
+                        .foregroundColor(.teal)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
-                        .background(Color.purple.opacity(0.1))
+                        .background(Color.teal.opacity(0.1))
                         .cornerRadius(8)
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -62,7 +62,7 @@ struct RulesEngineView: View {
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(viewModel.isRulesEngineEnabled ? Color.purple.opacity(0.2) : Color.white.opacity(0.04), lineWidth: 1)
+                .stroke(viewModel.isRulesEngineEnabled ? Color.teal.opacity(0.2) : Color.white.opacity(0.04), lineWidth: 1)
         )
         .padding(.horizontal, 24)
     }
@@ -77,7 +77,7 @@ struct RuleRowView: View {
             // Header Row: Toggle, Sensor, Rule Type, Trash
             HStack(spacing: 12) {
                 Toggle("", isOn: $rule.isEnabled)
-                    .toggleStyle(SwitchToggleStyle(tint: .green))
+                    .toggleStyle(SwitchToggleStyle(tint: .teal))
                     .labelsHidden()
                 
                 Text("if")
@@ -130,7 +130,7 @@ struct RuleRowView: View {
                             .frame(width: 36)
                         
                         Slider(value: $rule.thresholdTemp, in: 30...95, step: 1)
-                            .accentColor(.purple)
+                            .accentColor(.teal)
                     }
                     
                     HStack(spacing: 12) {
@@ -145,7 +145,7 @@ struct RuleRowView: View {
                             .frame(width: 36)
                         
                         Slider(value: $rule.targetSpeedPercent, in: 0...100, step: 5)
-                            .accentColor(.purple)
+                            .accentColor(.teal)
                     }
                 }
             } else {
