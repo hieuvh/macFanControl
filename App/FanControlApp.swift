@@ -22,13 +22,20 @@ struct FanControlApp: App {
             MenuBarPopoverView(viewModel: viewModel)
         } label: {
             HStack(spacing: 4) {
-                Image(systemName: "wind")
-                // if let firstFan = viewModel.fans.first {
-                //     Text("\(firstFan.currentSpeed) RPM")
-                // } else {
-                //     Text("Fan Control")
-                // }
+                Image(systemName: "fan.fill")
+                if let firstFan = viewModel.fans.first {
+                    Text("\(firstFan.currentSpeed)")
+                        .animatableNumber(value: Double(firstFan.currentSpeed))
+                        .font(.system(size: 10, weight: .bold))
+                } else {
+                    Text("--")
+                        .font(.system(size: 10, weight: .bold))
+                }
+                Text("RPM")
+                    .font(.system(size: 10))
             }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
         }
         .menuBarExtraStyle(.window)
     }
