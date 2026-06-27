@@ -138,7 +138,14 @@ class FanViewModel: ObservableObject {
             var fansList: [FanJSON] = []
             
             for i in 0..<fanCount {
-                let name = smc.getStringValue("F\(i)ID") ?? "Fan \(i)"
+                let name: String
+                if fanCount == 2 {
+                    name = i == 0 ? "Left" : "Right"
+                } else if fanCount == 1 {
+                    name = "Fan"
+                } else {
+                    name = "Fan \(i + 1)"
+                }
                 let current = Int(smc.getValue("F\(i)Ac") ?? 0)
                 let minS = Int(smc.getValue("F\(i)Mn") ?? 0)
                 let maxS = Int(smc.getValue("F\(i)Mx") ?? 0)

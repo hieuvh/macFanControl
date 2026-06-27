@@ -36,18 +36,18 @@ struct FanControlApp: App {
                 .font(.system(size: 14))
                 .foregroundColor(.white)
             
-            HStack(spacing: 2) {
+            VStack(spacing: 2) {
                 RoundedRectangle(cornerRadius: 1)
-                    .fill(speed > 0 ? Color.white : Color.gray.opacity(0.3))
-                    .frame(width: 3, height: 12)
+                    .fill(speed >= 5500 ? Color.red : Color.gray.opacity(0.4))
+                    .frame(width: 4, height: 3)
                 
                 RoundedRectangle(cornerRadius: 1)
-                    .fill(speed >= 3000 ? Color.yellow : Color.gray.opacity(0.3))
-                    .frame(width: 3, height: 12)
-                
+                    .fill(speed >= 3500 ? Color.yellow : Color.gray.opacity(0.4))
+                    .frame(width: 4, height: 3)
+
                 RoundedRectangle(cornerRadius: 1)
-                    .fill(speed >= 5000 ? Color.red : Color.gray.opacity(0.3))
-                    .frame(width: 3, height: 12)
+                    .fill(speed > 0 ? Color.white : Color.gray.opacity(0.4))
+                    .frame(width: 4, height: 3)
             }
         }
         
