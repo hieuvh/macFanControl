@@ -39,6 +39,16 @@ struct SettingsTabView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.white.opacity(0.05))
                 .cornerRadius(12)
+                
+                // Version Info
+                HStack {
+                    Spacer()
+                    Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "3.0") (Build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.4))
+                    Spacer()
+                }
+                .padding(.top, 16)
             }
             .padding(32)
         }
